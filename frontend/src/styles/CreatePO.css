@@ -1,0 +1,52 @@
+.create-po-container {
+    padding: 30px;
+}
+
+.create-po-card {
+    background: white;
+    max-width: 900px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.create-po-card h1 {
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+}
+
+.form-group textarea {
+    min-height: 120px;
+}
+
+.save-btn {
+    background: #b5121b;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background: #8d0f15;
+}

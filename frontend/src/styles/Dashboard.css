@@ -1,0 +1,15 @@
+.page-container {
+    padding: 30px;
+}
+
+.summary-container {
+    display: flex;
+    gap: 20px;
+}
+
+.summary-card {
+    width: 220px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+}

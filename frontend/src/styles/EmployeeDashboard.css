@@ -1,0 +1,86 @@
+.dashboard {
+  padding: 30px;
+  background-color: #f4f6f9;
+  min-height: 100vh;
+}
+
+.welcome-section {
+  margin-bottom: 25px;
+}
+
+.welcome-section h1 {
+  margin: 0;
+  color: #333;
+}
+
+.welcome-section p {
+  color: #666;
+}
+
+.stats-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: white;
+  width: 220px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+.stat-card h3 {
+  margin: 0;
+  color: #555;
+}
+
+.stat-card p {
+  font-size: 32px;
+  font-weight: bold;
+  color: #0078d4;
+  margin-top: 10px;
+}
+
+.quick-actions {
+  margin-bottom: 30px;
+}
+
+.quick-actions button {
+  padding: 12px 20px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #0078d4;
+  color: white;
+  cursor: pointer;
+}
+
+.quick-actions button:hover {
+  background: #005ea2;
+}
+
+.recent-orders {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+}
+
+.recent-orders table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recent-orders th,
+.recent-orders td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.recent-orders th {
+  background-color: #f8f8f8;
+}

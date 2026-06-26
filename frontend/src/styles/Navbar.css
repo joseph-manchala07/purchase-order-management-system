@@ -1,0 +1,41 @@
+.navbar {
+    background-color: #b5121b;
+    color: white;
+    height: 85px;
+    padding: 0 25px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.logo h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+}
+
+.logo p {
+    margin: 0;
+    font-size: 14px;
+    color: white;
+}
+
+.nav-links {
+    display: flex;
+    gap: 25px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    font-size: 18px;
+}
+
+.nav-links a:hover {
+    opacity: .8;
+}

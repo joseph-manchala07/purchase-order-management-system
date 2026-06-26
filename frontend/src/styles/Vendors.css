@@ -1,0 +1,75 @@
+.vendors-container {
+  padding: 30px;
+}
+
+.vendors-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.vendors-header h1 {
+  margin: 0;
+}
+
+.search-section {
+  margin-bottom: 20px;
+}
+
+.search-section input {
+  width: 350px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.vendors-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.vendors-table th,
+.vendors-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.vendors-table th {
+  background-color: #f4f4f4;
+}
+
+.add-btn {
+  background: #b01c2e;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background: #0078d4;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background: crimson;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.vendor-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
