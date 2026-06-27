@@ -20,12 +20,15 @@
     border-collapse: collapse;
 }
 
-.mypo-table thead {
-    background: #b5121b;
-    color: white;
+.mypo-table thead th {
+    background-color: #b5121b !important;
+    color: white !important;
 }
 
-.mypo-table th,
+.mypo-table th {
+    padding: 14px;
+    text-align: left;
+}
 .mypo-table td {
     padding: 14px;
     text-align: left;

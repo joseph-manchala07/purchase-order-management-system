@@ -40,12 +40,15 @@
     border-collapse: collapse;
 }
 
-.vendors-table thead {
-    background: #b5121b;
-    color: white;
+.vendors-table thead th {
+    background-color: #b5121b !important;
+    color: white !important;
 }
 
-.vendors-table th,
+.vendors-table th {
+    padding: 14px;
+    text-align: left;
+}
 .vendors-table td {
     padding: 14px;
     text-align: left;

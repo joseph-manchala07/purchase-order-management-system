@@ -4,14 +4,14 @@
 
 .create-po-card {
     background: white;
-    max-width: 900px;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,.1);
 }
 
 .create-po-card h1 {
     margin-bottom: 25px;
+    color: #2c3e50;
 }
 
 .form-group {
@@ -29,13 +29,20 @@
 .form-group textarea {
     width: 100%;
     padding: 12px;
-    box-sizing: border-box;
     border: 1px solid #dcdcdc;
     border-radius: 8px;
+    box-sizing: border-box;
 }
 
 .form-group textarea {
     min-height: 120px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 .save-btn {
@@ -45,6 +52,7 @@
     padding: 12px 24px;
     border-radius: 8px;
     cursor: pointer;
+    font-weight: 600;
 }
 
 .save-btn:hover {

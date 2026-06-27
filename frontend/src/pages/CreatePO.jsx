@@ -5,9 +5,14 @@ import "../styles/CreatePO.css";
 
 function CreatePO() {
     const [vendors, setVendors] = useState([]);
+
     const [VendorID, setVendorID] = useState("");
-    const [Description, setDescription] = useState("");
-    const [Amount, setAmount] = useState("");
+    const [PurchaseDescription, setPurchaseDescription] = useState("");
+    const [ReasonForPurchase, setReasonForPurchase] = useState("");
+    const [EstimatedCost, setEstimatedCost] = useState("");
+    const [ActualCost, setActualCost] = useState("");
+    const [InvoiceReceived, setInvoiceReceived] = useState(false);
+    const [Notes, setNotes] = useState("");
 
     useEffect(() => {
         loadVendors();
@@ -25,16 +30,29 @@ function CreatePO() {
     const savePO = async () => {
         try {
             const response = await api.post("/po", {
-                UserID: 1,
+                EmployeeID: 10001,
                 VendorID,
-                Description,
-                Amount
+                PurchaseDescription,
+                ReasonForPurchase,
+                EstimatedCost,
+                ActualCost,
+                InvoiceReceived,
+                Notes
             });
 
             alert(response.data.message);
+
+            setVendorID("");
+            setPurchaseDescription("");
+            setReasonForPurchase("");
+            setEstimatedCost("");
+            setActualCost("");
+            setInvoiceReceived(false);
+            setNotes("");
+
         } catch (error) {
             console.error(error);
-            alert("Error creating PO");
+            alert("Error creating Purchase Order");
         }
     };
 
@@ -43,6 +61,7 @@ function CreatePO() {
             <Navbar />
 
             <div className="create-po-container">
+
                 <div className="create-po-card">
 
                     <h1>Create Purchase Order</h1>
@@ -54,7 +73,9 @@ function CreatePO() {
                             value={VendorID}
                             onChange={(e) => setVendorID(e.target.value)}
                         >
-                            <option value="">Select Vendor</option>
+                            <option value="">
+                                Select Vendor
+                            </option>
 
                             {vendors.map((vendor) => (
                                 <option
@@ -68,24 +89,72 @@ function CreatePO() {
                     </div>
 
                     <div className="form-group">
-                        <label>Description</label>
+                        <label>Purchase Description</label>
 
                         <textarea
-                            value={Description}
+                            value={PurchaseDescription}
                             onChange={(e) =>
-                                setDescription(e.target.value)
+                                setPurchaseDescription(e.target.value)
                             }
                         />
                     </div>
 
                     <div className="form-group">
-                        <label>Amount</label>
+                        <label>Reason For Purchase</label>
+
+                        <textarea
+                            value={ReasonForPurchase}
+                            onChange={(e) =>
+                                setReasonForPurchase(e.target.value)
+                            }
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Estimated Cost</label>
 
                         <input
                             type="number"
-                            value={Amount}
+                            value={EstimatedCost}
                             onChange={(e) =>
-                                setAmount(e.target.value)
+                                setEstimatedCost(e.target.value)
+                            }
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label>Actual Cost</label>
+
+                        <input
+                            type="number"
+                            value={ActualCost}
+                            onChange={(e) =>
+                                setActualCost(e.target.value)
+                            }
+                        />
+                    </div>
+
+                    <div className="checkbox-group">
+                        <input
+                            type="checkbox"
+                            checked={InvoiceReceived}
+                            onChange={(e) =>
+                                setInvoiceReceived(e.target.checked)
+                            }
+                        />
+
+                        <label>
+                            Invoice Received
+                        </label>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Notes</label>
+
+                        <textarea
+                            value={Notes}
+                            onChange={(e) =>
+                                setNotes(e.target.value)
                             }
                         />
                     </div>
@@ -94,10 +163,11 @@ function CreatePO() {
                         className="save-btn"
                         onClick={savePO}
                     >
-                        Create PO
+                        Create Purchase Order
                     </button>
 
                 </div>
+
             </div>
         </>
     );
