@@ -1,67 +1,75 @@
 import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
 import api from "../Services/api";
+import "../styles/MyPOs.css";
 
 function MyPOs() {
+    const [purchaseOrders, setPurchaseOrders] = useState([]);
 
-  const [purchaseOrders,
-    setPurchaseOrders] =
-    useState([]);
+    useEffect(() => {
+        loadPOs();
+    }, []);
 
-  useEffect(() => {
+    const loadPOs = async () => {
+        try {
+            const response = await api.get("/po/my/1");
+            setPurchaseOrders(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-    loadPOs();
+    return (
+        <>
+            <Navbar />
 
-  }, []);
+            <div className="mypo-container">
 
-  const loadPOs = async () => {
+                <div className="mypo-card">
 
-    const response =
-      await api.get("/po/my/1");
+                    <h1>My Purchase Orders</h1>
 
-    setPurchaseOrders(
-      response.data
+                    <table className="mypo-table">
+
+                        <thead>
+                            <tr>
+                                <th>PO Number</th>
+                                <th>Vendor</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {purchaseOrders.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5">
+                                        No Purchase Orders Found
+                                    </td>
+                                </tr>
+                            ) : (
+                                purchaseOrders.map((po) => (
+                                    <tr key={po.POID}>
+                                        <td>{po.PONumber}</td>
+                                        <td>{po.VendorName}</td>
+                                        <td>{po.Description}</td>
+                                        <td>${po.Amount}</td>
+                                        <td>{po.Status}</td>
+                                    </tr>
+                                ))
+                            )}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+        </>
     );
-  };
-
-  return (
-    <div>
-
-      <h2>My Purchase Orders</h2>
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>PO Number</th>
-            <th>Vendor</th>
-            <th>Amount</th>
-            <th>Status</th>
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          {purchaseOrders.map(po => (
-
-            <tr key={po.POID}>
-
-              <td>{po.PONumber}</td>
-              <td>{po.VendorName}</td>
-              <td>${po.Amount}</td>
-              <td>{po.Status}</td>
-
-            </tr>
-
-          ))}
-
-        </tbody>
-
-      </table>
-
-    </div>
-  );
 }
 
 export default MyPOs;

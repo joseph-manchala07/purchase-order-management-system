@@ -1,78 +1,77 @@
 import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
 import api from "../Services/api";
+import "../styles/Vendors.css";
 
 function Vendors() {
+    const [vendors, setVendors] = useState([]);
 
-  const [vendors, setVendors] =
-    useState([]);
+    useEffect(() => {
+        loadVendors();
+    }, []);
 
-  useEffect(() => {
-    loadVendors();
-  }, []);
+    const loadVendors = async () => {
+        try {
+            const response = await api.get("/vendors");
+            setVendors(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-  const loadVendors = async () => {
+    return (
+        <>
+            <Navbar />
 
-    const response =
-      await api.get("/vendors");
+            <div className="vendors-container">
 
-    setVendors(response.data);
-  };
+                <div className="vendors-card">
 
-  return (
+                    <div className="vendors-header">
+                        <h1>Vendors</h1>
 
-            <div className="page-container">
-            <div className="content-wrapper">
+                        <button className="add-vendor-btn">
+                            Add Vendor
+                        </button>
+                    </div>
 
-                <PageHeader
-                title="Vendors"
-                buttonText="Add Vendor"
-                />
+                    <table className="vendors-table">
 
-                <Card>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
 
-                <table className="app-table">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Contact</th>
-                    <th>Email</th>
-                </tr>
-                </thead>
+                        <tbody>
 
-                <tbody>
+                            {vendors.length === 0 ? (
+                                <tr>
+                                    <td colSpan="3">
+                                        No Vendors Found
+                                    </td>
+                                </tr>
+                            ) : (
+                                vendors.map((vendor) => (
+                                    <tr key={vendor.VendorID}>
+                                        <td>{vendor.VendorName}</td>
+                                        <td>{vendor.ContactPerson}</td>
+                                        <td>{vendor.Email}</td>
+                                    </tr>
+                                ))
+                            )}
 
-                {vendors.map(v => (
+                        </tbody>
 
-                    <tr key={v.VendorID}>
-                    <td>{v.VendorName}</td>
-                    <td>{v.ContactPerson}</td>
-                    <td>{v.Email}</td>
-                    </tr>
+                    </table>
 
-                ))}
-
-                </tbody>
-                </table>
-
-                </Card>
-
-
-
-            <div className="card">
-
-                <table>
-                
-
-            </table>
+                </div>
 
             </div>
-
-        </div>
-
-      
-
-    </div>
-  );
+        </>
+    );
 }
 
 export default Vendors;
