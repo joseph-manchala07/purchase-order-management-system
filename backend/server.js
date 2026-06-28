@@ -36,3 +36,12 @@ app.use(
   "/api/po",
   require("./routes/poRoutes")
 );
+app.use(
+    "/api/employees",
+    require("./routes/employeeRoutes")
+);
+
+app.use(
+    "/api/approvers",
+    require("./routes/approverRoutes")
+);

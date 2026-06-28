@@ -10,8 +10,15 @@ router.post(
 );
 
 router.get(
+    "/next-number",
+    poController.getNextPONumber
+);
+
+router.get(
   "/my/:userid",
   poController.getMyPOs
 );
+
+
 
 module.exports = router;
