@@ -17,8 +17,7 @@ function CreatePO() {
     const [PurchaseDescription, setPurchaseDescription] = useState("");
     const [ReasonForPurchase, setReasonForPurchase] = useState("");
     const [EstimatedCost, setEstimatedCost] = useState("");
-    const [ActualCost, setActualCost] = useState("");
-    const [InvoiceReceived, setInvoiceReceived] = useState(false);
+
 
     const [showEmployeeModal, setShowEmployeeModal] =
         useState(false);
@@ -137,17 +136,14 @@ function CreatePO() {
 
         try {
 
-            const response =
-                await api.post("/po", {
-                    EmployeeID,
-                    ApprovedBy,
-                    VendorID,
-                    PurchaseDescription,
-                    ReasonForPurchase,
-                    EstimatedCost,
-                    ActualCost,
-                    InvoiceReceived
-                });
+            await api.post("/po", {
+                EmployeeID,
+                ApprovedBy,
+                VendorID,
+                PurchaseDescription,
+                ReasonForPurchase,
+                EstimatedCost
+            });
 
             setSuccessMessage(
                 `✅ Purchase Order #${response.data.poNumber} has been submitted for Approval`
@@ -158,8 +154,7 @@ function CreatePO() {
             setPurchaseDescription("");
             setReasonForPurchase("");
             setEstimatedCost("");
-            setActualCost("");
-            setInvoiceReceived(false);
+
 
         } catch (error) {
             console.error(error);
@@ -299,7 +294,7 @@ function CreatePO() {
                             </div>
 
                             <div className="row">
-                                <label>Approved By:</label>
+                                <label>Approve By:</label>
 
                                 <select
                                     value={ApprovedBy}
@@ -413,50 +408,17 @@ function CreatePO() {
                                 />
                             </div>
 
-                            <div className="row">
-                                <label>
-                                    Actual Cost:
-                                </label>
-
-                                <input
-                                    type="number"
-                                    value={ActualCost}
-                                    onChange={(e) =>
-                                        setActualCost(
-                                            e.target.value
-                                        )
-                                    }
-                                />
-                            </div>
+                            
 
                         </div>
 
-                        <div className="checkbox-row">
-                            <input
-                                type="checkbox"
-                                checked={InvoiceReceived}
-                                onChange={(e) =>
-                                    setInvoiceReceived(
-                                        e.target.checked
-                                    )
-                                }
-                            />
 
-                            <label>
-                                Receipt / Invoice Received
-                            </label>
-                        </div>
 
                     </div>
 
                     <div className="footer-row">
 
-                        <button
-                            type="button"
-                            className="print-btn"
-                        >
-                            🖨
-                        </button>
+
 
                         <div className="action-buttons">
 
