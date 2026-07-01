@@ -61,3 +61,41 @@ exports.createApprover = async (req, res) => {
         });
     }
 };
+exports.getApprovedPO = async (req, res) => {
+    try {
+
+        const { id } = req.params;
+
+        const [rows] = await db.query(
+            `
+            SELECT
+                p.*,
+                e.EmployeeName,
+                a.EmployeeName AS ApproverName,
+                v.VendorName
+            FROM PurchaseOrders p
+
+            LEFT JOIN Employees e
+                ON p.EmployeeID = e.EmployeeID
+
+            LEFT JOIN Approvers a
+                ON p.ApprovedBy = a.ApproverID
+
+            LEFT JOIN Vendors v
+                ON p.VendorID = v.VendorID
+
+            WHERE p.PO_ID = ?
+            `,
+            [id]
+        );
+
+        res.json(rows[0]);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+};

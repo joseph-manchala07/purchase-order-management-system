@@ -1,0 +1,218 @@
+.approved-po-wrapper {
+    padding: 5px;
+}
+
+.approved-banner {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.print-btn {
+    background: #b5121b;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+
+.po-print-page {
+    max-width: 850px;
+}
+
+
+.po-title-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+.vendor-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    background: #990000;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color: white;
+    padding: 15px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.vendor-left {
+    flex: 1;
+}
+
+.vendor-right {
+    flex: 1;
+}
+
+.field-row {
+    display: flex;
+    margin-bottom: 8px;
+}
+
+.field-label {
+    width: 90px;
+    font-weight: bold;
+}
+
+.field-value {
+    background: white;
+    color: black;
+    padding: 4px;
+    flex: 1;
+}
+
+.notes-box {
+    min-height: 100px;
+}
+
+.purchase-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.purchase-table th {
+    color: #990000;
+    text-align: left;
+    border-bottom: 2px solid #990000;
+    padding: 8px;
+}
+
+.purchase-table td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.money {
+    text-align: right;
+}
+
+.total-line {
+    margin-top: 15px;
+    text-align: right;
+    font-size: 18px;
+}
+
+.total-line span {
+    margin-left: 30px;
+}
+
+.status-approved-print {
+    text-align: center;
+    margin: 40px 0;
+    font-size: 28px;
+    color: #198754;
+    font-weight: bold;
+}
+
+.signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.signature-column {
+    width: 220px;
+    text-align: center;
+}
+
+.signature-heading {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.signature-name {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.signature-line {
+    border-top: 1px solid black;
+    margin-bottom: 8px;
+}
+
+.signature-role {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+@page {
+    size: portrait;
+    margin: 0.50in;
+}
+
+.sa-logo {
+    height: 40px;
+    margin-bottom: 10px;
+}
+
+.vendor-box {
+    background: #990000;
+}
+
+.sa-logo {
+    width: 100%;
+    height: 50%;
+    margin-bottom: 30px;
+}
+.po-header {
+    margin-bottom: 15px;
+}
+
+@media print {
+
+    .no-print,
+    nav,
+    button {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    .approved-po-wrapper {
+        padding: 0;
+    }
+
+    .po-print-page {
+        width: 8in;
+        min-height: 10.5in;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        box-sizing: border-box;
+
+    }
+    
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    .po-footer {
+        margin-top: 40px;
+        border-top: 3px solid black;
+
+        display: flex;
+        justify-content: space-between;
+
+        padding-top: 6px;
+
+        font-weight: 600;
+    }
+
+}
+

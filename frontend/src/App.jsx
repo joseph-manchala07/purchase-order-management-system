@@ -11,6 +11,9 @@ import PODetails from "./pages/PODetails";
 import Vendors from "./pages/Vendors";
 import Reports from "./pages/Reports";
 import ApproverDashboard from "./pages/ApproverDashboard";
+import ApprovedPO from "./pages/ApprovedPO";
+import ApproverPODetails from "./pages/ApproverPODetails";
+
 
 function App() {
     return (
@@ -63,6 +66,18 @@ function App() {
                     path="/approver-dashboard"
                     element={<ApproverDashboard />}
                 />
+                
+                <Route
+                    path="/approver-po/:id"
+                    element={<ApproverPODetails />}
+                />
+
+                
+                <Route
+                    path="/approved-po/:id"
+                    element={<ApprovedPO />}
+                />
+
 
             </Routes>
 

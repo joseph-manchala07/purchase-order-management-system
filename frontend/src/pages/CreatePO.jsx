@@ -136,7 +136,7 @@ function CreatePO() {
 
         try {
 
-            await api.post("/po", {
+            const response = await api.post("/po", {
                 EmployeeID,
                 ApprovedBy,
                 VendorID,

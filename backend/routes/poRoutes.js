@@ -33,6 +33,13 @@ router.put(
     poController.rejectPO
 );
 
-
+router.get(
+    "/details/:id",
+    poController.getPOById
+);
+router.get(
+    "/approved/:id",
+    poController.getApprovedPO
+);
 
 module.exports = router;
