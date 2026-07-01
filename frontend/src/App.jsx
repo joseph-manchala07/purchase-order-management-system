@@ -10,7 +10,7 @@ import MyPOs from "./pages/MyPOs";
 import PODetails from "./pages/PODetails";
 import Vendors from "./pages/Vendors";
 import Reports from "./pages/Reports";
-
+import ApproverDashboard from "./pages/ApproverDashboard";
 
 function App() {
     return (
@@ -58,6 +58,10 @@ function App() {
                 <Route
                     path="/reports"
                     element={<Reports />}
+                />
+                <Route
+                    path="/approver-dashboard"
+                    element={<ApproverDashboard />}
                 />
 
             </Routes>

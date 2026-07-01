@@ -19,6 +19,20 @@ router.get(
   poController.getMyPOs
 );
 
+router.get(
+    "/pending",
+    poController.getPendingPOs
+);
+router.put(
+    "/approve/:id",
+    poController.approvePO
+);
+
+router.put(
+    "/reject/:id",
+    poController.rejectPO
+);
+
 
 
 module.exports = router;
