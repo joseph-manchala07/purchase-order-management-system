@@ -184,6 +184,7 @@ body,
     width: 100%;
     border-collapse: collapse;
     margin-top: 8px;
+    background: white;
     
 }
 
@@ -208,6 +209,7 @@ body,
     padding: 6px;
     font-family: "Times New Roman", Times, serif;
     font-size: 12pt;
+    background: white;
 }
 
 
@@ -356,4 +358,14 @@ body,
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
+}
+
+.po-print-page,
+.po-body,
+.purchase-table,
+.purchase-table tbody,
+.purchase-table tr,
+.purchase-table td,
+.purchase-table th {
+    background: white !important;
 }
