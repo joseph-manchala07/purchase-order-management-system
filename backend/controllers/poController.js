@@ -291,8 +291,10 @@ exports.getApprovedPO = async (req, res) => {
                 p.*,
 
                 e.EmployeeName,
+                e.Title AS EmployeeTitle,
 
                 a.EmployeeName AS ApproverName,
+                a.Title AS ApproverTitle,
 
                 v.VendorName,
                 v.Phone,
