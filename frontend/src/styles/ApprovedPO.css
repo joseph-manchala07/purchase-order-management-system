@@ -58,21 +58,38 @@ body,
     margin: 0 auto;
 
     position: relative;
+    
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+
 }
 
 
 .sa-logo {
     width: 100%;
     max-height: 120px;
-    object-fit: contain;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
 }
 
 .po-title-row {
     display: flex;
     justify-content: space-between;
-    font-size: 22px;
-    margin-bottom: 20px;
+    align-items: center;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.po-title-left {
+    color: #990000;
+    font-size: 20pt;
+    font-weight: bold;
+}
+
+.po-title-right {
+    font-size: 12pt;
+    font-weight: bold;
 }
 
 .vendor-box {
@@ -121,11 +138,16 @@ body,
     margin-bottom: 4px;
 }
 
+
 .field-label {
     width: 55px;
     min-width: 55px;
-    font-weight: 700;
+
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    font-weight: bold;
 }
+
 .field-value {
     flex: 1;
 
@@ -139,6 +161,10 @@ body,
     overflow-wrap: break-word;
 
     box-sizing: border-box;
+    
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+
 }
 
 
@@ -153,22 +179,37 @@ body,
 }
 
 
+
 .purchase-table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 8px;
+    
 }
 
 .purchase-table th {
     text-align: left;
-    padding: 8px;
-    border-bottom: 2px solid #990000;
-    color: #990000;
+
+    color: #800000;
+
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    font-weight: bold;
+
+    padding: 4px 6px;
+
+    border-top: 3px solid #800000;
+    border-bottom: 3px solid #800000;
 }
 
+
 .purchase-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
+    border: none;
+    padding: 6px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
 }
+
 
 .money {
     text-align: right;
@@ -179,16 +220,48 @@ body,
     margin-top: 10px;
     font-size: 18px;
     font-weight: 700;
+    
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    font-weight: bold;
+
 }
 
 .total-line span {
     margin-left: 20px;
 }
 
+
+.total-row {
+    border-top: 1px solid #800000;
+}
+
+
+.total-row td {
+    border: none;
+    padding-top: 10px;
+
+    font-weight: bold;
+}
+
+
+
+
+.total-label {
+    text-align: right;
+    padding-right: 25px;
+}
+
+.total-cost {
+    text-align: right;
+    white-space: nowrap;
+}
+
+
 .signature-section {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+    margin-top: 120px;
 }
 
 .signature-column {
@@ -200,10 +273,19 @@ body,
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 10px;
+    
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    font-weight: bold;
+
 }
 
 .signature-name {
     margin-bottom: 6px;
+    
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+
 }
 
 .signature-line {
@@ -215,6 +297,11 @@ body,
 .signature-role {
     margin-top: 8px;
     font-weight: 600;
+    
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    font-weight: bold;
+
 }
 
 
@@ -234,6 +321,10 @@ body,
 
     font-size: 12px;
     font-weight: 600;
+    
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+
 }
 .footer-left {
     text-align: left;

@@ -65,24 +65,19 @@ function ApprovedPO() {
                                 className="sa-logo"
                             />
 
+                            
                             <div className="po-title-row">
 
-                                <div>
-                                    <strong>
-                                        Purchase Order # {po.PO_Number}
-                                    </strong>
+                                <div className="po-title-left">
+                                    Purchase Order # {po.PO_Number}
                                 </div>
 
-                                <div>
-                                    <strong>
-                                        Date{" "}
-                                        {new Date(
-                                            po.CreatedDate
-                                        ).toLocaleDateString()}
-                                    </strong>
+                                <div className="po-title-right">
+                                    Date {new Date(po.CreatedDate).toLocaleDateString()}
                                 </div>
 
                             </div>
+
 
                         </div>
 
@@ -142,33 +137,34 @@ function ApprovedPO() {
 
                             <thead>
                                 <tr>
-                                    <th>
-                                        Purchase Description
-                                    </th>
-
-                                    <th>
-                                        Reason For Purchase
-                                    </th>
-
-                                    <th>
-                                        Est Cost Of Purchase
-                                    </th>
+                                    <th>Purchase Description</th>
+                                    <th>Reason for Purchase</th>
+                                    <th>Est cost of purchase</th>
                                 </tr>
                             </thead>
 
                             <tbody>
 
                                 <tr>
+                                    <td>{po.PurchaseDescription}</td>
 
-                                    <td>
-                                        {po.PurchaseDescription}
-                                    </td>
-
-                                    <td>
-                                        {po.ReasonForPurchase}
-                                    </td>
+                                    <td>{po.ReasonForPurchase}</td>
 
                                     <td className="money">
+                                        $
+                                        {Number(
+                                            po.EstimatedCost || 0
+                                        ).toFixed(2)}
+                                    </td>
+                                </tr>
+
+                                <tr className="total-row">
+
+                                    <td colSpan="2" className="total-label">
+                                        Total estimated cost of purchase
+                                    </td>
+
+                                    <td className="money total-cost">
                                         $
                                         {Number(
                                             po.EstimatedCost || 0
@@ -181,20 +177,7 @@ function ApprovedPO() {
 
                         </table>
 
-                        <div className="total-line">
-
-                            <strong>
-                                Total Estimated Cost Of Purchase
-                            </strong>
-
-                            <span>
-                                $
-                                {Number(
-                                    po.EstimatedCost || 0
-                                ).toFixed(2)}
-                            </span>
-
-                        </div>
+                        
 
                         <div className="signature-section">
                             <div className="signature-column">
