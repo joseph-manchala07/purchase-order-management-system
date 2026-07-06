@@ -9,9 +9,26 @@ router.get(
   vendorController.getVendors
 );
 
+
 router.post(
-  "/",
-  vendorController.createVendor
+    "/",
+    vendorController.createVendor
+);
+
+
+router.get(
+    "/:id",
+    vendorController.getVendorById
+);
+
+router.put(
+    "/:id",
+    vendorController.updateVendor
+);
+
+router.delete(
+    "/:id",
+    vendorController.deleteVendor
 );
 
 module.exports = router;

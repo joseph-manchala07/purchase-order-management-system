@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import api from "../Services/api";
 import "../styles/Vendors.css";
 
 function Vendors() {
+    const navigate = useNavigate();
+
     const [vendors, setVendors] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         loadVendors();
@@ -18,6 +22,34 @@ function Vendors() {
             console.error(error);
         }
     };
+    
+
+    const deleteVendor = async (vendorId) => {
+
+        try {
+
+            await api.delete(
+                `/vendors/${vendorId}`
+            );
+
+            loadVendors();
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                error.response?.data?.message ||
+                "Unable to delete vendor."
+            );
+
+        }
+    };
+    const filteredVendors = vendors.filter((vendor) =>
+        (vendor.VendorName || "")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
+    );
 
     return (
         <>
@@ -28,37 +60,118 @@ function Vendors() {
                 <div className="vendors-card">
 
                     <div className="vendors-header">
-                        <h1>Vendors</h1>
 
-                        <button className="add-vendor-btn">
-                            Add Vendor
+                        <div>
+                            <h1>Vendor Management</h1>
+
+                            <p className="vendor-count">
+                                Total Vendors: {vendors.length}
+                            </p>
+                        </div>
+
+                        <button
+                            className="add-vendor-btn"
+                            onClick={() =>
+                                navigate("/vendors/new")
+                            }
+                        >
+                            + Add Vendor
                         </button>
+
+                    </div>
+
+                    <div className="vendor-toolbar">
+
+                        <input
+                            type="text"
+                            className="vendor-search"
+                            placeholder="Search Vendor..."
+                            value={searchTerm}
+                            onChange={(e) =>
+                                setSearchTerm(
+                                    e.target.value
+                                )
+                            }
+                        />
+
                     </div>
 
                     <table className="vendors-table">
 
                         <thead>
                             <tr>
-                                <th>Name</th>
+                                <th>Vendor</th>
                                 <th>Contact</th>
+                                <th>Phone</th>
                                 <th>Email</th>
+                                <th>City</th>
+                                <th>State</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
 
                         <tbody>
 
-                            {vendors.length === 0 ? (
+                            {filteredVendors.length === 0 ? (
                                 <tr>
-                                    <td colSpan="3">
+                                    <td colSpan="7">
                                         No Vendors Found
                                     </td>
                                 </tr>
                             ) : (
-                                vendors.map((vendor) => (
+                                filteredVendors.map((vendor) => (
                                     <tr key={vendor.VendorID}>
-                                        <td>{vendor.VendorName}</td>
-                                        <td>{vendor.ContactPerson}</td>
-                                        <td>{vendor.Email}</td>
+
+                                        <td>
+                                            {vendor.VendorName}
+                                        </td>
+
+                                        <td>
+                                            {vendor.ContactName}
+                                        </td>
+
+                                        <td>
+                                            {vendor.Phone}
+                                        </td>
+
+                                        <td>
+                                            {vendor.Email}
+                                        </td>
+
+                                        <td>
+                                            {vendor.City}
+                                        </td>
+
+                                        <td>
+                                            {vendor.State}
+                                        </td>
+
+                                        <td>
+
+                                            <button
+                                                className="delete-btn"
+                                                onClick={() =>
+                                                    navigate(
+                                                        `/vendors/edit/${vendor.VendorID}`
+                                                    )
+                                                }
+                                            >
+                                                Edit
+                                            </button>
+
+                                            <button
+                                                className="delete-btn"
+                                                onClick={() =>
+                                                    deleteVendor(
+                                                        vendor.VendorID
+                                                    )
+                                                }
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </td>
+
                                     </tr>
                                 ))
                             )}

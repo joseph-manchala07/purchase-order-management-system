@@ -13,6 +13,7 @@ import Reports from "./pages/Reports";
 import ApproverDashboard from "./pages/ApproverDashboard";
 import ApprovedPO from "./pages/ApprovedPO";
 import ApproverPODetails from "./pages/ApproverPODetails";
+import VendorForm from "./pages/VendorForm";
 
 
 function App() {
@@ -56,6 +57,17 @@ function App() {
                 <Route
                     path="/vendors"
                     element={<Vendors />}
+                />
+
+                <Route
+                    path="/vendors/new"
+                    element={<VendorForm />}
+                />
+
+                
+                <Route
+                    path="/vendors/edit/:id"
+                    element={<VendorForm />}
                 />
 
                 <Route
