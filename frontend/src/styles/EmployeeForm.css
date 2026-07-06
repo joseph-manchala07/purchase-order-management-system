@@ -1,0 +1,44 @@
+.employee-form-container {
+    max-width: 700px;
+    margin: 20px auto;
+}
+
+.employee-form-card {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+}
+
+.button-row {
+    display: flex;
+    gap: 10px;
+}
+
+.save-btn {
+    background: #b5121b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+}
+
+.cancel-btn {
+    background: gray;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+}

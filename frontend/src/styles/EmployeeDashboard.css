@@ -1,86 +1,44 @@
-.dashboard {
-  padding: 30px;
-  background-color: #f4f6f9;
-  min-height: 100vh;
+.employees-container {
+    padding: 20px;
 }
 
-.welcome-section {
-  margin-bottom: 25px;
+.employees-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
 }
 
-.welcome-section h1 {
-  margin: 0;
-  color: #333;
+.employees-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 
-.welcome-section p {
-  color: #666;
+.add-employee-btn {
+    background: #b5121b;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
 }
 
-.stats-container {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 25px;
+.employee-search {
+    width: 300px;
+    padding: 10px;
 }
 
-.stat-card {
-  background: white;
-  width: 220px;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.1);
+.employees-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.stat-card h3 {
-  margin: 0;
-  color: #555;
+.employees-table th {
+    background: #b5121b;
+    color: white;
+    padding: 10px;
 }
 
-.stat-card p {
-  font-size: 32px;
-  font-weight: bold;
-  color: #0078d4;
-  margin-top: 10px;
-}
-
-.quick-actions {
-  margin-bottom: 30px;
-}
-
-.quick-actions button {
-  padding: 12px 20px;
-  margin-right: 10px;
-  border: none;
-  border-radius: 5px;
-  background: #0078d4;
-  color: white;
-  cursor: pointer;
-}
-
-.quick-actions button:hover {
-  background: #005ea2;
-}
-
-.recent-orders {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.1);
-}
-
-.recent-orders table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.recent-orders th,
-.recent-orders td {
-  text-align: left;
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-}
-
-.recent-orders th {
-  background-color: #f8f8f8;
+.employees-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
 }

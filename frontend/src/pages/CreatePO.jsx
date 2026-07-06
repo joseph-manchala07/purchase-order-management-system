@@ -422,12 +422,6 @@ function CreatePO() {
 
                         <div className="action-buttons">
 
-                            <button
-                                className="save-btn"
-                                onClick={savePO}
-                            >
-                                Save Draft
-                            </button>
 
                             <button
                                 className="submit-btn"

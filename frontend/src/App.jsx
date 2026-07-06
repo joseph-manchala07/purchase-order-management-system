@@ -14,6 +14,8 @@ import ApproverDashboard from "./pages/ApproverDashboard";
 import ApprovedPO from "./pages/ApprovedPO";
 import ApproverPODetails from "./pages/ApproverPODetails";
 import VendorForm from "./pages/VendorForm";
+import PendingApprovals from "./pages/PendingApprovals";
+import ReviewPO from "./pages/ReviewPO";
 
 
 function App() {
@@ -89,6 +91,32 @@ function App() {
                     path="/approved-po/:id"
                     element={<ApprovedPO />}
                 />
+
+                <Route
+                    path="/employees"
+                    element={<EmployeeDashboard />}
+                />
+
+                <Route
+                    path="/employees/new"
+                    element={<EmployeeForm />}
+                />
+
+                <Route
+                    path="/employees/edit/:id"
+                    element={<EmployeeForm />}
+                />
+                
+                <Route
+                    path="/pending-approvals"
+                    element={<PendingApprovals />}
+                />
+
+                <Route
+                    path="/review-po/:id"
+                    element={<ReviewPO />}
+                />
+
 
 
             </Routes>

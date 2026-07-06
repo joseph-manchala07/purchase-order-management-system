@@ -1,0 +1,70 @@
+.pending-container {
+    padding: 20px;
+}
+
+.pending-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pending-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.pending-header h1 {
+    margin: 0;
+    color: #b5121b;
+}
+
+.pending-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pending-table th {
+    background: #b5121b;
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-weight: 600;
+}
+
+.pending-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.pending-table tr:hover {
+    background: #f8f8f8;
+}
+
+.review-btn {
+    background: #b5121b;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.review-btn:hover {
+    background: #921017;
+}
+
+@media (max-width: 768px) {
+
+    .pending-table {
+        font-size: 14px;
+    }
+
+    .pending-table th,
+    .pending-table td {
+        padding: 8px;
+    }
+}

@@ -11,11 +11,10 @@ function Navbar() {
             </div>
 
             <div className="nav-links">
-                <Link to="/dashboard">Dashboard</Link>
+                
                 <Link to="/create-po">Create PO</Link>
                 <Link to="/my-pos">My Purchase Orders</Link>
                 <Link to="/vendors">Vendors</Link>
-                <Link to="/reports">Reports</Link>
                 <Link to="/">Logout</Link>
             </div>
 
