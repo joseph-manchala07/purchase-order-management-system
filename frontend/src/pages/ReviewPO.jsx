@@ -22,10 +22,7 @@ function ReviewPO() {
 
         try {
 
-            const response =
-                await api.get(
-                    `/purchaseorders/${id}`
-                );
+            const response = await api.get(`/po/${id}`);
 
             setPo(response.data);
 
@@ -40,12 +37,9 @@ function ReviewPO() {
 
         try {
 
-            await api.put(
-                `/purchaseorders/${id}/approve`,
-                {
-                    Comments: comments
-                }
-            );
+            await api.put(`/po/${id}/approve`, {
+                Comments: comments
+            });
 
             navigate("/pending-approvals");
 
@@ -60,12 +54,9 @@ function ReviewPO() {
 
         try {
 
-            await api.put(
-                `/purchaseorders/${id}/reject`,
-                {
-                    Comments: comments
-                }
-            );
+            await api.put(`/po/${id}/reject`, {
+                Comments: comments
+            });
 
             navigate("/pending-approvals");
 

@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import api from "../Services/api";
 import "../styles/EmployeeForm.css";
 
-function EmployeeForm() {
+function ApproverForm() {
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -12,21 +12,17 @@ function EmployeeForm() {
         FirstName: "",
         LastName: "",
         Title: "",
-        IsApprover: 0
     });
 
     useEffect(() => {
         if (id) {
-            loadEmployee();
+            loadApprover();
         }
     }, [id]);
 
-    const loadEmployee = async () => {
+    const loadApprover = async () => {
         try {
-            const response = await api.get(
-                `/employees/${id}`
-            );
-
+            const response = await api.get(`/employees/${id}`);
             const nameParts = (response.data.EmployeeName || "").split(" ");
             const firstName = nameParts.shift() || "";
             const lastName = nameParts.join(" ") || "";
@@ -35,32 +31,29 @@ function EmployeeForm() {
                 FirstName: firstName,
                 LastName: lastName,
                 Title: response.data.Title || "",
-                IsApprover: response.data.IsApprover ? 1 : 0
             });
-
         } catch (error) {
             console.error(error);
         }
     };
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
         setFormData({
             ...formData,
-            [name]: type === "checkbox" ? (checked ? 1 : 0) : value
+            [e.target.name]: e.target.value
         });
     };
 
-    const saveEmployee = async (e) => {
+    const saveApprover = async (e) => {
         e.preventDefault();
 
-        const payload = {
-            EmployeeName: `${formData.FirstName.trim()} ${formData.LastName.trim()}`,
-            Title: formData.Title,
-            IsApprover: formData.IsApprover ? 1 : 0
-        };
-
         try {
+            const payload = {
+                EmployeeName: `${formData.FirstName.trim()} ${formData.LastName.trim()}`,
+                Title: formData.Title,
+                IsApprover: 1
+            };
+
             if (id) {
                 await api.put(`/employees/${id}`, payload);
             } else {
@@ -69,6 +62,7 @@ function EmployeeForm() {
             navigate("/employees");
         } catch (error) {
             console.error(error);
+            alert("Failed to save approver.");
         }
     };
 
@@ -77,20 +71,10 @@ function EmployeeForm() {
             <Navbar />
 
             <div className="employee-form-container">
-
                 <div className="employee-form-card">
+                    <h1>{id ? "Edit Approver" : "Add Approver"}</h1>
 
-                    <h1>
-                        {id
-                            ? "Edit Employee"
-                            : "Add Employee"}
-                    </h1>
-
-                    <form
-                        className="employee-form"
-                        onSubmit={saveEmployee}
-                    >
-
+                    <form className="employee-form" onSubmit={saveApprover}>
                         <div className="form-group">
                             <label>First Name</label>
                             <input
@@ -113,17 +97,15 @@ function EmployeeForm() {
                             />
                         </div>
 
-                        {formData.IsApprover === 1 && (
-                            <div className="form-group">
-                                <label>Username</label>
-                                <input
-                                    type="text"
-                                    value={`${formData.FirstName.trim()}.${formData.LastName.trim()}`.toLowerCase()}
-                                    readOnly
-                                />
-                                <small>Approver username is generated from first and last name and cannot be edited.</small>
-                            </div>
-                        )}
+                        <div className="form-group">
+                            <label>Username</label>
+                            <input
+                                type="text"
+                                value={`${formData.FirstName.trim()}.${formData.LastName.trim()}`.toLowerCase()}
+                                readOnly
+                            />
+                            <small>Approver username is generated from first and last name and cannot be edited.</small>
+                        </div>
 
                         <div className="form-group">
                             <label>Title</label>
@@ -136,44 +118,25 @@ function EmployeeForm() {
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label>Administrator</label>
-                            <input
-                                type="checkbox"
-                                name="IsApprover"
-                                checked={formData.IsApprover === 1}
-                                onChange={handleChange}
-                            />
-                        </div>
+                        {/* Active flag removed; employees are either present or deleted */}
 
                         <div className="button-row">
-
                             <button
                                 type="button"
                                 className="cancel-btn"
-                                onClick={() =>
-                                    navigate("/employees")
-                                }
+                                onClick={() => navigate("/employees")}
                             >
                                 Cancel
                             </button>
-
-                            <button
-                                type="submit"
-                                className="save-btn"
-                            >
-                                Save Employee
+                            <button type="submit" className="save-btn">
+                                Save Approver
                             </button>
-
                         </div>
-
                     </form>
-
                 </div>
-
             </div>
         </>
     );
 }
 
-export default EmployeeForm;
+export default ApproverForm;

@@ -145,7 +145,7 @@ exports.getPendingPOs = async (req, res) => {
             SELECT
                 p.PO_ID,
                 p.PO_Number,
-                e.EmployeeName,
+                CONCAT_WS(' ', e.FirstName, e.LastName) AS EmployeeName,
                 v.VendorName,
                 p.EstimatedCost,
                 p.Status,
@@ -248,16 +248,16 @@ exports.getPOById = async (req, res) => {
             `
             SELECT
                 p.*,
-                e.EmployeeName,
-                a.EmployeeName AS ApproverName,
+                CONCAT_WS(' ', e.FirstName, e.LastName) AS EmployeeName,
+                CONCAT_WS(' ', a.FirstName, a.LastName) AS ApproverName,
                 v.VendorName
             FROM PurchaseOrders p
 
             LEFT JOIN Employees e
                 ON p.EmployeeID = e.EmployeeID
 
-            LEFT JOIN Approvers a
-                ON p.ApprovedBy = a.ApproverID
+            LEFT JOIN Employees a
+                ON p.ApprovedBy = a.EmployeeID
 
             LEFT JOIN Vendors v
                 ON p.VendorID = v.VendorID
@@ -290,10 +290,10 @@ exports.getApprovedPO = async (req, res) => {
             SELECT
                 p.*,
 
-                e.EmployeeName,
+                CONCAT_WS(' ', e.FirstName, e.LastName) AS EmployeeName,
                 e.Title AS EmployeeTitle,
 
-                a.EmployeeName AS ApproverName,
+                CONCAT_WS(' ', a.FirstName, a.LastName) AS ApproverName,
                 a.Title AS ApproverTitle,
 
                 v.VendorName,
@@ -311,8 +311,8 @@ exports.getApprovedPO = async (req, res) => {
             LEFT JOIN Employees e
                 ON p.EmployeeID = e.EmployeeID
 
-            LEFT JOIN Approvers a
-                ON p.ApprovedBy = a.ApproverID
+            LEFT JOIN Employees a
+                ON p.ApprovedBy = a.EmployeeID
 
             LEFT JOIN Vendors v
                 ON p.VendorID = v.VendorID

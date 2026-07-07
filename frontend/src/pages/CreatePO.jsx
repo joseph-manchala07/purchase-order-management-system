@@ -25,17 +25,13 @@ function CreatePO() {
     const [showApproverModal, setShowApproverModal] =
         useState(false);
 
-    const [newEmployeeName, setNewEmployeeName] =
-        useState("");
+    const [newEmployeeFirstName, setNewEmployeeFirstName] = useState("");
+    const [newEmployeeLastName, setNewEmployeeLastName] = useState("");
+    const [newEmployeeTitle, setNewEmployeeTitle] = useState("");
 
-    const [newEmployeeTitle, setNewEmployeeTitle] =
-        useState("");
-
-    const [newApproverName, setNewApproverName] =
-        useState("");
-
-    const [newApproverTitle, setNewApproverTitle] =
-        useState("");
+    const [newApproverFirstName, setNewApproverFirstName] = useState("");
+    const [newApproverLastName, setNewApproverLastName] = useState("");
+    const [newApproverTitle, setNewApproverTitle] = useState("");
 
     const [poNumber, setPoNumber] = useState("");
 
@@ -77,9 +73,8 @@ function CreatePO() {
 
     const loadApprovers = async () => {
         try {
-            const response =
-                await api.get("/approvers");
-
+            // Load approvers from Employees where IsApprover = 1
+            const response = await api.get("/employees?isApprover=1");
             setApprovers(response.data);
         } catch (error) {
             console.error(error);
@@ -163,17 +158,16 @@ function CreatePO() {
     };
 
     const saveEmployee = async () => {
-        if (!newEmployeeName.trim()) {
-            alert("Employee name is required");
+        if (!newEmployeeFirstName.trim() || !newEmployeeLastName.trim()) {
+            alert("Employee first and last name are required");
             return;
         }
 
         try {
-
             await api.post("/employees", {
-                EmployeeName: newEmployeeName,
+                EmployeeName: `${newEmployeeFirstName.trim()} ${newEmployeeLastName.trim()}`,
                 Title: newEmployeeTitle,
-                Active: 1
+                IsApprover: 0
             });
 
             await loadEmployees();
@@ -190,17 +184,16 @@ function CreatePO() {
     };
 
     const saveApprover = async () => {
-        if (!newApproverName.trim()) {
-            alert("Approver name is required");
+        if (!newApproverFirstName.trim() || !newApproverLastName.trim()) {
+            alert("Approver first and last name are required");
             return;
         }
 
         try {
-
-            await api.post("/approvers", {
-                EmployeeName: newApproverName,
+            await api.post("/employees", {
+                EmployeeName: `${newApproverFirstName.trim()} ${newApproverLastName.trim()}`,
                 Title: newApproverTitle,
-                Active: 1
+                IsApprover: 1
             });
 
             await loadApprovers();
@@ -308,8 +301,8 @@ function CreatePO() {
 
                                     {approvers.map(approver => (
                                         <option
-                                            key={approver.ApproverID}
-                                            value={approver.ApproverID}
+                                            key={approver.EmployeeID}
+                                            value={approver.EmployeeID}
                                         >
                                             {approver.EmployeeName}
                                         </option>
@@ -445,12 +438,25 @@ function CreatePO() {
                         <h2>Add Employee</h2>
 
                         <div className="modal-field">
-                            <label>Employee</label>
+                            <label>First Name</label>
 
                             <input
-                                value={newEmployeeName}
+                                value={newEmployeeFirstName}
                                 onChange={(e) =>
-                                    setNewEmployeeName(
+                                    setNewEmployeeFirstName(
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="modal-field">
+                            <label>Last Name</label>
+
+                            <input
+                                value={newEmployeeLastName}
+                                onChange={(e) =>
+                                    setNewEmployeeLastName(
                                         e.target.value
                                     )
                                 }
@@ -501,15 +507,38 @@ function CreatePO() {
                         <h2>Add Approver</h2>
 
                         <div className="modal-field">
-                            <label>Employee</label>
+                            <label>First Name</label>
 
                             <input
-                                value={newApproverName}
+                                value={newApproverFirstName}
                                 onChange={(e) =>
-                                    setNewApproverName(
+                                    setNewApproverFirstName(
                                         e.target.value
                                     )
                                 }
+                            />
+                        </div>
+
+                        <div className="modal-field">
+                            <label>Last Name</label>
+
+                            <input
+                                value={newApproverLastName}
+                                onChange={(e) =>
+                                    setNewApproverLastName(
+                                        e.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="modal-field">
+                            <label>Username</label>
+
+                            <input
+                                type="text"
+                                value={`${newApproverFirstName.trim()}.${newApproverLastName.trim()}`.toLowerCase()}
+                                readOnly
                             />
                         </div>
 

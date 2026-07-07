@@ -2,6 +2,31 @@
     padding: 30px;
 }
 
+.page-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.edit-btn{
+    background: #b5121b;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.delete-btn {
+    background: #b5121b;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
 .summary-container {
     display: flex;
     gap: 20px;

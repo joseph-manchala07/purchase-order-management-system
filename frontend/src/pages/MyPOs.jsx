@@ -51,11 +51,11 @@ function MyPOs() {
                                 </tr>
                             ) : (
                                 purchaseOrders.map((po) => (
-                                    <tr key={po.POID}>
-                                        <td>{po.PONumber}</td>
+                                    <tr key={po.PO_ID}>
+                                        <td>{po.PO_Number}</td>
                                         <td>{po.VendorName}</td>
-                                        <td>{po.Description}</td>
-                                        <td>${po.Amount}</td>
+                                        <td>{po.PurchaseDescription}</td>
+                                        <td>${Number(po.EstimatedCost || 0).toFixed(2)}</td>
                                         <td>{po.Status}</td>
                                     </tr>
                                 ))

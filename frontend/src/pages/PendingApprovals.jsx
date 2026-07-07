@@ -18,10 +18,7 @@ function PendingApprovals() {
     const loadPendingPOs = async () => {
         try {
 
-            const response =
-                await api.get(
-                    "/purchaseorders/pending"
-                );
+            const response = await api.get("/po/pending");
 
             setPurchaseOrders(response.data);
 
@@ -73,9 +70,7 @@ function PendingApprovals() {
                                 </tr>
                             ) : (
                                 purchaseOrders.map((po) => (
-                                    <tr
-                                        key={po.POID}
-                                    >
+                                    <tr key={po.PO_ID}>
                                         <td>
                                             {po.PO_Number}
                                         </td>
@@ -102,20 +97,17 @@ function PendingApprovals() {
                                         </td>
 
                                         <td>
-
                                             <button
                                                 className="review-btn"
                                                 onClick={() =>
                                                     navigate(
-                                                        `/review-po/${po.POID}`
+                                                        `/review-po/${po.PO_ID}`
                                                     )
                                                 }
                                             >
                                                 Review
                                             </button>
-
                                         </td>
-
                                     </tr>
                                 ))
                             )}

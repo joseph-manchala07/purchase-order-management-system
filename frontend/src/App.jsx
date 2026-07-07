@@ -3,19 +3,24 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
-import AdminDashboard from "./pages/AdminDashboard";
 
 import CreatePO from "./pages/CreatePO";
 import MyPOs from "./pages/MyPOs";
 import PODetails from "./pages/PODetails";
 import Vendors from "./pages/Vendors";
-import Reports from "./pages/Reports";
 import ApproverDashboard from "./pages/ApproverDashboard";
 import ApprovedPO from "./pages/ApprovedPO";
 import ApproverPODetails from "./pages/ApproverPODetails";
 import VendorForm from "./pages/VendorForm";
 import PendingApprovals from "./pages/PendingApprovals";
 import ReviewPO from "./pages/ReviewPO";
+import ApproverForm from "./pages/ApproverForm";
+import AdminUsers from "./pages/AdminUsers";
+import AdminUserForm from "./pages/AdminUserForm";
+import TempAddUser from "./pages/TempAddUser";
+import ChangePassword from "./pages/ChangePassword";
+
+import EmployeeForm from "./pages/EmployeeForm";
 
 
 function App() {
@@ -24,7 +29,17 @@ function App() {
 
             <Routes>
 
-                <Route path="/" element={<Login />} />
+                <Route path="/" element={<CreatePO />} />
+
+                <Route
+                    path="/login"
+                    element={<Login />}
+                />
+
+                <Route
+                    path="/change-password"
+                    element={<ChangePassword />}
+                />
 
                 <Route
                     path="/dashboard"
@@ -34,11 +49,6 @@ function App() {
                 <Route
                     path="/employee-dashboard"
                     element={<EmployeeDashboard />}
-                />
-
-                <Route
-                    path="/admin-dashboard"
-                    element={<AdminDashboard />}
                 />
 
                 <Route
@@ -73,10 +83,6 @@ function App() {
                 />
 
                 <Route
-                    path="/reports"
-                    element={<Reports />}
-                />
-                <Route
                     path="/approver-dashboard"
                     element={<ApproverDashboard />}
                 />
@@ -92,6 +98,7 @@ function App() {
                     element={<ApprovedPO />}
                 />
 
+                
                 <Route
                     path="/employees"
                     element={<EmployeeDashboard />}
@@ -105,6 +112,32 @@ function App() {
                 <Route
                     path="/employees/edit/:id"
                     element={<EmployeeForm />}
+                />
+
+                <Route
+                    path="/approvers/new"
+                    element={<ApproverForm />}
+                />
+
+                <Route
+                    path="/approvers/edit/:id"
+                    element={<ApproverForm />}
+                />
+
+                
+
+                <Route
+                    path="/admin-users"
+                    element={<AdminUsers />}
+                />
+
+                <Route
+                    path="/admin-users/new"
+                    element={<AdminUserForm />}
+                />
+                <Route
+                    path="/temp-add-user"
+                    element={<TempAddUser />}
                 />
                 
                 <Route

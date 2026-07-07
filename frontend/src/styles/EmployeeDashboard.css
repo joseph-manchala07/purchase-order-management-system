@@ -12,6 +12,24 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-controls label {
+    font-weight: 600;
+}
+
+.header-controls select {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #dcdcdc;
 }
 
 .add-employee-btn {
@@ -20,6 +38,17 @@
     border: none;
     padding: 10px 16px;
     cursor: pointer;
+}
+
+.edit-btn,
+.delete-btn {
+    background: #b5121b;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5px;
 }
 
 .employee-search {
@@ -41,4 +70,32 @@
 .employees-table td {
     padding: 10px;
     border-bottom: 1px solid #ddd;
+}
+
+.approvers-summary {
+    background: #f9f9f9;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.approvers-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.approver-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.approver-badge {
+    background: #e1e7ff;
+    color: #1f3c88;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.95rem;
 }

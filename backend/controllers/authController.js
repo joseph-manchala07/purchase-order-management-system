@@ -2,63 +2,76 @@ const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const DEFAULT_PASSWORD = process.env.DEFAULT_USER_PASSWORD || "DefaultPass123!";
+
+const isDefaultPasswordHash = async (hash) => {
+  return await bcrypt.compare(DEFAULT_PASSWORD, hash);
+};
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const [users] = await db.query(
-      "SELECT * FROM Users WHERE Email = ?",
-      [email]
+    const [rows] = await db.query(
+      `SELECT EmployeeID, FirstName, LastName, Email, IsApprover, PasswordHash,
+              IFNULL(PasswordMustChange, 0) AS PasswordMustChange
+       FROM Employees
+       WHERE IsApprover = 1
+         AND (
+           Email = ?
+           OR CONCAT_WS(' ', FirstName, LastName) = ?
+           OR CONCAT_WS('.', FirstName, LastName) = ?
+         )`,
+      [email, email, email]
     );
 
-    if (users.length === 0) {
-      return res.status(401).json({
-        message: "Invalid email or password"
-      });
+    if (rows.length === 0) {
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const user = users[0];
+    const employee = rows[0];
 
-    const validPassword = await bcrypt.compare(
-      password,
-      user.PasswordHash
-    );
+    if (!employee.PasswordHash) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    const validPassword = await bcrypt.compare(password, employee.PasswordHash);
 
     if (!validPassword) {
-      return res.status(401).json({
-        message: "Invalid email or password"
-      });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
+
+    const forcePasswordChange =
+      employee.PasswordMustChange === 1 ||
+      (await isDefaultPasswordHash(employee.PasswordHash));
+
+    // Map IsApprover to role; keep existing frontend checks working by using "Administrator"
+    const role = employee.IsApprover === 1 ? "Administrator" : "Employee";
 
     const token = jwt.sign(
       {
-        UserID: user.UserID,
-        Email: user.Email,
-        Role: user.Role
+        EmployeeID: employee.EmployeeID,
+        Email: employee.Email,
+        Role: role
       },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "8h"
-      }
+      { expiresIn: "8h" }
     );
 
     res.status(200).json({
       token,
+      role,
+      forcePasswordChange,
       user: {
-        UserID: user.UserID,
-        Name: `${user.FirstName} ${user.LastName}`,
-        Email: user.Email,
-        Role: user.Role
+        EmployeeID: employee.EmployeeID,
+        Name: `${employee.FirstName} ${employee.LastName}`.trim(),
+        Email: employee.Email,
+        Role: role
       }
     });
 
   } catch (error) {
-
     console.error(error);
-
-    res.status(500).json({
-      message: "Server Error"
-    });
-
+    res.status(500).json({ message: "Server Error" });
   }
 };

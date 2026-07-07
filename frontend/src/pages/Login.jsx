@@ -4,7 +4,7 @@ import api from "../Services/api";
 import "../styles/Login.css";
 
 function Login() {
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
@@ -13,16 +13,31 @@ function Login() {
 
         try {
             const response = await api.post("/auth/login", {
-                email,
+                email: username,
                 password
             });
 
             console.log(response.data);
 
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("role", response.data.role);
+            const role = response.data.role || response.data.user?.Role;
+            const user = response.data.user || null;
 
-            navigate("/dashboard");
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("role", role);
+            if (user) {
+              localStorage.setItem("user", JSON.stringify(user));
+            }
+
+            if (response.data.forcePasswordChange) {
+                navigate("/change-password");
+                return;
+            }
+
+            if (role === "Administrator") {
+                navigate("/approver-dashboard");
+            } else {
+                navigate("/create-po");
+            }
 
         } catch (error) {
             console.error(error);
@@ -42,21 +57,25 @@ function Login() {
 
                 <form onSubmit={handleSubmit}>
 
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
+                        <div className="form-group">
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                    </div>
 
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
+                    <div className="form-group">
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
 
-                    <button type="submit">
+                    <button type="submit" className="submit-btn">
                         Login
                     </button>
 
