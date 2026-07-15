@@ -78,9 +78,8 @@ exports.createEmployee = async (req, res) => {
     const normalizedEmail = Email ? Email.trim() : null;
     const userEmail = normalizedEmail || (isApproverInt === 1 ? getDefaultEmail(name.FirstName, name.LastName) : null);
 
-    if (isApproverInt === 1) {
-      const pwd = Password || process.env.DEFAULT_USER_PASSWORD || "DefaultPass123!";
-      passwordHash = await bcrypt.hash(pwd, 10);
+    if (Password) {
+      passwordHash = await bcrypt.hash(Password, 10);
     }
 
     const passwordMustChange = isApproverInt === 1 && !Password ? 1 : 0;
@@ -184,10 +183,8 @@ exports.updateEmployee = async (req, res) => {
 
     let passwordMustChange = existingPasswordMustChange;
 
-    // Auto-reset password when promoted to approver and no explicit Password provided
+    // When promoted to approver without an explicit password, require first-time setup
     if (!passwordHash && existingIsApprover === 0 && newIsApprover === 1) {
-      const defaultPassword = process.env.DEFAULT_USER_PASSWORD || "DefaultPass123!";
-      passwordHash = await bcrypt.hash(defaultPassword, 10);
       passwordMustChange = 1;
     }
 
@@ -218,13 +215,7 @@ exports.updateEmployee = async (req, res) => {
 
     await db.query(sql, params);
 
-    const responsePayload = { message: "Employee updated" };
-    if (passwordHash && existingIsApprover === 0 && newIsApprover === 1 && !Password) {
-      responsePayload.passwordReset = true;
-      responsePayload.passwordNote = "Password was reset to default for the new administrator.";
-    }
-
-    res.json(responsePayload);
+    res.json({ message: "Employee updated" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
@@ -268,12 +259,13 @@ exports.revokeAdministrator = async (req, res) => {
 exports.resetPassword = async (req, res) => {
   try {
     const { id } = req.params;
-    const defaultPassword = process.env.DEFAULT_USER_PASSWORD || "DefaultPass123!";
-    const passwordHash = await bcrypt.hash(defaultPassword, 10);
 
-    await db.query(`UPDATE Employees SET PasswordHash = ? WHERE EmployeeID = ?`, [passwordHash, id]);
+    await db.query(
+      `UPDATE Employees SET PasswordHash = NULL, PasswordMustChange = 1 WHERE EmployeeID = ?`,
+      [id]
+    );
 
-    res.json({ message: "Password reset to default." });
+    res.json({ message: "Password reset. The user must set a new password via First Time Setup." });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });

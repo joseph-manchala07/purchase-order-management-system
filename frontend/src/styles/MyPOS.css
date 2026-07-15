@@ -41,3 +41,18 @@
 .mypo-table tbody tr:hover {
     background: #f8f9fa;
 }
+
+.view-receipt-btn {
+    background: #b5121b;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.view-receipt-btn:hover {
+    opacity: 0.88;
+}

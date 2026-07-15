@@ -1,0 +1,112 @@
+.search-po-container {
+    padding: 30px;
+}
+
+.search-po-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-po-card h1 {
+    margin-top: 0;
+    margin-bottom: 24px;
+    color: #2c3e50;
+}
+
+.search-po-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.search-po-input {
+    flex: 1;
+    padding: 11px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #333;
+}
+
+.search-po-btn {
+    padding: 11px 28px;
+    background: #b5121b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.search-po-btn:hover {
+    opacity: 0.88;
+}
+
+.search-po-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.search-po-table thead th {
+    background-color: #b5121b;
+    color: white;
+    padding: 13px 14px;
+    text-align: left;
+}
+
+.search-po-table td {
+    padding: 13px 14px;
+    text-align: left;
+    border-bottom: 1px solid #ececec;
+}
+
+.search-po-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.search-po-msg {
+    text-align: center;
+    color: #777;
+    padding: 20px 0;
+}
+
+.receipt-btn {
+    background: #b5121b;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.receipt-btn:hover {
+    opacity: 0.88;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-pending-approval {
+    background: #fff3cd;
+    color: #856404;
+}

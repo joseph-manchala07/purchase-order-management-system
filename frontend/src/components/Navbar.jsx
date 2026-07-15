@@ -28,6 +28,7 @@ function Navbar() {
                         <Link to="/approver-dashboard">Pending Approvals</Link>
                         <Link to="/create-po">Create PO</Link>
                         <Link to="/my-pos">My Purchase Orders</Link>
+                        <Link to="/search-po">Search PO</Link>
                         <Link to="/vendors">Vendors</Link>
                         <Link to="/admin-users">Approver Accounts</Link>
                         <Link to="/employee-dashboard">Employees</Link>
@@ -44,6 +45,7 @@ function Navbar() {
                         <Link to="/approver-dashboard">Pending Approvals</Link>
                         <Link to="/create-po">Create PO</Link>
                         <Link to="/my-pos">My Purchase Orders</Link>
+                        <Link to="/search-po">Search PO</Link>
                         <Link to="/vendors">Vendors</Link>
                         <button
                             type="button"
@@ -56,6 +58,7 @@ function Navbar() {
                 ) : token ? (
                     <>
                         <Link to="/create-po">Create PO</Link>
+                        <Link to="/search-po">Search PO</Link>
                         <Link to="/vendors">Vendors</Link>
                         <button
                             type="button"
@@ -68,6 +71,7 @@ function Navbar() {
                 ) : (
                     <>
                         <Link to="/create-po">Create PO</Link>
+                        <Link to="/search-po">Search PO</Link>
                         <Link to="/vendors">Vendors</Link>
                         <Link to="/login">Admin Login</Link>
                     </>

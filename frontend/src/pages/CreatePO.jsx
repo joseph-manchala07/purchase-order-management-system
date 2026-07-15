@@ -535,16 +535,6 @@ function CreatePO() {
                         </div>
 
                         <div className="modal-field">
-                            <label>Username</label>
-
-                            <input
-                                type="text"
-                                value={`${newApproverFirstName.trim()}.${newApproverLastName.trim()}`.toLowerCase()}
-                                readOnly
-                            />
-                        </div>
-
-                        <div className="modal-field">
                             <label>Title</label>
 
                             <input

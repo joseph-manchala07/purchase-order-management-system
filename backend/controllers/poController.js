@@ -72,6 +72,91 @@ exports.createPO = async (req, res) => {
     }
 };
 
+exports.searchPOs = async (req, res) => {
+    try {
+
+        const q = `%${(req.query.q || "").trim()}%`;
+
+        const [rows] = await db.query(
+            `
+            SELECT
+                p.PO_ID,
+                p.PO_Number,
+                CONCAT_WS(' ', e.FirstName, e.LastName) AS EmployeeName,
+                v.VendorName,
+                p.PurchaseDescription,
+                p.EstimatedCost,
+                p.Status,
+                p.SubmittedDate,
+                p.ApprovedDate,
+                CONCAT_WS(' ', a.FirstName, a.LastName) AS ApproverName
+            FROM PurchaseOrders p
+            LEFT JOIN Vendors v ON p.VendorID = v.VendorID
+            LEFT JOIN Employees e ON p.EmployeeID = e.EmployeeID
+            LEFT JOIN Employees a ON p.ApprovedBy = a.EmployeeID
+            WHERE
+                p.PO_Number LIKE ?
+                OR p.PurchaseDescription LIKE ?
+                OR v.VendorName LIKE ?
+                OR CONCAT_WS(' ', e.FirstName, e.LastName) LIKE ?
+            ORDER BY p.PO_ID DESC
+            LIMIT 100
+            `,
+            [q, q, q, q]
+        );
+
+        res.json(rows);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({ message: error.message });
+
+    }
+};
+
+exports.getAllPOs = async (req, res) => {
+    try {
+
+        const [rows] = await db.query(
+            `
+            SELECT
+                p.PO_ID,
+                p.PO_Number,
+                CONCAT_WS(' ', e.FirstName, e.LastName) AS EmployeeName,
+                v.VendorName,
+                p.PurchaseDescription,
+                p.ReasonForPurchase,
+                p.EstimatedCost,
+                p.Status,
+                p.SubmittedDate,
+                p.ApprovedDate,
+                CONCAT_WS(' ', a.FirstName, a.LastName) AS ApproverName
+            FROM PurchaseOrders p
+            LEFT JOIN Vendors v
+                ON p.VendorID = v.VendorID
+            LEFT JOIN Employees e
+                ON p.EmployeeID = e.EmployeeID
+            LEFT JOIN Employees a
+                ON p.ApprovedBy = a.EmployeeID
+            ORDER BY p.PO_ID DESC
+            `
+        );
+
+        res.json(rows);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+};
+
 exports.getMyPOs = async (req, res) => {
     try {
 

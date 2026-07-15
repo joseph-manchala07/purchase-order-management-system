@@ -75,6 +75,25 @@ function Login() {
                         Login
                     </button>
                 </form>
+
+                <button
+                    type="button"
+                    onClick={() => navigate("/first-time-setup")}
+                    style={{
+                        marginTop: "14px",
+                        width: "100%",
+                        background: "transparent",
+                        border: "1px solid #b5121b",
+                        padding: "12px 0",
+                        borderRadius: "8px",
+                        fontSize: "15px",
+                        cursor: "pointer",
+                        color: "#b5121b",
+                        fontWeight: "600",
+                    }}
+                >
+                    First Time User
+                </button>
             </div>
         </div>
     );

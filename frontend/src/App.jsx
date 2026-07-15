@@ -17,6 +17,8 @@ import ApproverForm from "./pages/ApproverForm";
 import AdminUsers from "./pages/AdminUsers";
 import TempAddUser from "./pages/TempAddUser";
 import ChangePassword from "./pages/ChangePassword";
+import FirstTimeSetup from "./pages/FirstTimeSetup";
+import SearchPO from "./pages/SearchPO";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EmployeeForm from "./pages/EmployeeForm";
 
@@ -27,6 +29,8 @@ function App() {
                 <Route path="/" element={<CreatePO />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/change-password" element={<ChangePassword />} />
+                <Route path="/first-time-setup" element={<FirstTimeSetup />} />
+                <Route path="/search-po" element={<SearchPO />} />
                 <Route path="/dashboard" element={<Dashboard />} />
 
                 <Route
