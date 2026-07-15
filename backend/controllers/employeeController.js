@@ -27,10 +27,11 @@ const parseEmployeeName = (employeeName, firstName, lastName) => {
 };
 
 // Get employees.
-// Optional query: ?isApprover=1 to filter approvers
+// Optional query: ?isApprover=1 or ?isAdministrator=1
 exports.getEmployees = async (req, res) => {
   try {
     const isApprover = req.query.isApprover;
+    const isAdministrator = req.query.isAdministrator;
 
     let sql = `
             SELECT
@@ -38,9 +39,11 @@ exports.getEmployees = async (req, res) => {
                 FirstName,
                 LastName,
                 CONCAT_WS(' ', FirstName, LastName) AS EmployeeName,
+                COALESCE(NULLIF(Email, ''), CONCAT_WS('.', FirstName, LastName)) AS Username,
                 Title,
                 Email,
                 IsApprover,
+                IsAdministrator,
                 CreatedDate
             FROM Employees
         `;
@@ -49,6 +52,8 @@ exports.getEmployees = async (req, res) => {
 
     if (isApprover === "1") {
       sql += " WHERE IsApprover = 1";
+    } else if (isAdministrator === "1") {
+      sql += " WHERE IsAdministrator = 1";
     }
 
     sql += " ORDER BY FirstName, LastName";
@@ -64,9 +69,10 @@ exports.getEmployees = async (req, res) => {
 
 exports.createEmployee = async (req, res) => {
   try {
-    const { EmployeeName, FirstName, LastName, Title, Email, IsApprover = 0, Password } = req.body;
+    const { EmployeeName, FirstName, LastName, Title, Email, IsApprover = 0, IsAdministrator = 0, Password } = req.body;
     const name = parseEmployeeName(EmployeeName, FirstName, LastName);
-    const isApproverInt = IsApprover == 1 ? 1 : 0;
+    const isAdministratorInt = IsAdministrator == 1 ? 1 : 0;
+    const isApproverInt = isAdministratorInt === 1 ? 1 : (IsApprover == 1 ? 1 : 0);
 
     let passwordHash = null;
     const normalizedEmail = Email ? Email.trim() : null;
@@ -88,13 +94,14 @@ exports.createEmployee = async (req, res) => {
                 Title,
                 Email,
                 IsApprover,
+                IsAdministrator,
                 PasswordHash,
                 PasswordMustChange,
                 CreatedDate
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
             `,
-      [name.FirstName, name.LastName, Title || null, userEmail, isApproverInt, passwordHash, passwordMustChange]
+      [name.FirstName, name.LastName, Title || null, userEmail, isApproverInt, isAdministratorInt, passwordHash, passwordMustChange]
     );
 
     res.json({ message: "Employee added" });
@@ -115,9 +122,11 @@ exports.getEmployeeById = async (req, res) => {
                 FirstName,
                 LastName,
                 CONCAT_WS(' ', FirstName, LastName) AS EmployeeName,
+                COALESCE(NULLIF(Email, ''), CONCAT_WS('.', FirstName, LastName)) AS Username,
                 Title,
                 Email,
                 IsApprover,
+                IsAdministrator,
                 CreatedDate
             FROM Employees
             WHERE EmployeeID = ?
@@ -139,17 +148,18 @@ exports.getEmployeeById = async (req, res) => {
 exports.updateEmployee = async (req, res) => {
   try {
     const { id } = req.params;
-    const { EmployeeName, FirstName, LastName, Title, Email, IsApprover, Password } = req.body;
+    const { EmployeeName, FirstName, LastName, Title, Email, IsApprover, IsAdministrator, Password } = req.body;
     const name = parseEmployeeName(EmployeeName, FirstName, LastName);
 
-    // fetch existing approver flag and password-change state
+    // fetch existing role flags and password-change state
     const [existingRows] = await db.query(
-      `SELECT IsApprover, IFNULL(PasswordMustChange, 0) AS PasswordMustChange
+      `SELECT IsApprover, IsAdministrator, IFNULL(PasswordMustChange, 0) AS PasswordMustChange
        FROM Employees
        WHERE EmployeeID = ?`,
       [id]
     );
     const existingIsApprover = existingRows && existingRows[0] ? (existingRows[0].IsApprover ? 1 : 0) : 0;
+    const existingIsAdministrator = existingRows && existingRows[0] ? (existingRows[0].IsAdministrator ? 1 : 0) : 0;
     const existingPasswordMustChange = existingRows && existingRows[0] ? (existingRows[0].PasswordMustChange ? 1 : 0) : 0;
 
     let passwordHash = undefined;
@@ -157,7 +167,18 @@ exports.updateEmployee = async (req, res) => {
       passwordHash = await bcrypt.hash(Password, 10);
     }
 
-    const newIsApprover = IsApprover ? 1 : 0;
+    const newIsAdministrator = IsAdministrator !== undefined
+      ? (IsAdministrator ? 1 : 0)
+      : existingIsAdministrator;
+
+    let newIsApprover = IsApprover !== undefined
+      ? (IsApprover ? 1 : 0)
+      : existingIsApprover;
+
+    if (newIsAdministrator === 1) {
+      newIsApprover = 1;
+    }
+
     const normalizedEmail = Email ? Email.trim() : null;
     const userEmail = normalizedEmail || (newIsApprover === 1 ? getDefaultEmail(name.FirstName, name.LastName) : null);
 
@@ -180,10 +201,11 @@ exports.updateEmployee = async (req, res) => {
       "Title = ?",
       "Email = ?",
       "IsApprover = ?",
+      "IsAdministrator = ?",
       "PasswordMustChange = ?"
     ];
 
-    const params = [name.FirstName, name.LastName, Title || null, userEmail, newIsApprover, passwordMustChange];
+    const params = [name.FirstName, name.LastName, Title || null, userEmail, newIsApprover, newIsAdministrator, passwordMustChange];
 
     if (passwordHash) {
       fields.push("PasswordHash = ?");
@@ -223,6 +245,26 @@ exports.deleteEmployee = async (req, res) => {
   }
 };
 
+exports.revokeAdministrator = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.query(
+      `UPDATE Employees
+       SET
+         IsApprover = 0,
+         IsAdministrator = 0
+       WHERE EmployeeID = ?`,
+      [id]
+    );
+
+    res.json({ message: "Approver access removed" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.resetPassword = async (req, res) => {
   try {
     const { id } = req.params;
@@ -241,7 +283,7 @@ exports.resetPassword = async (req, res) => {
 exports.changePassword = async (req, res) => {
   try {
     const { id } = req.params;
-    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const { newPassword, confirmPassword } = req.body;
 
     if (!newPassword || newPassword.length < 8) {
       return res.status(400).json({ message: "New password must be at least 8 characters." });
@@ -259,12 +301,6 @@ exports.changePassword = async (req, res) => {
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "Employee not found" });
-    }
-
-    const validCurrent = await bcrypt.compare(currentPassword || "", rows[0].PasswordHash);
-
-    if (!validCurrent) {
-      return res.status(401).json({ message: "Current password is incorrect" });
     }
 
     const passwordHash = await bcrypt.hash(newPassword, 10);

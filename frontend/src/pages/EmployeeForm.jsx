@@ -35,7 +35,7 @@ function EmployeeForm() {
                 FirstName: firstName,
                 LastName: lastName,
                 Title: response.data.Title || "",
-                IsApprover: response.data.IsApprover ? 1 : 0
+                IsApprover: Number(response.data.IsApprover) === 1 ? 1 : 0
             });
 
         } catch (error) {
@@ -137,7 +137,7 @@ function EmployeeForm() {
                         </div>
 
                         <div className="form-group">
-                            <label>Administrator</label>
+                            <label>Approver</label>
                             <input
                                 type="checkbox"
                                 name="IsApprover"

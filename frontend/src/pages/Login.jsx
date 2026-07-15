@@ -17,15 +17,14 @@ function Login() {
                 password
             });
 
-            console.log(response.data);
-
-            const role = response.data.role || response.data.user?.Role;
+            const role = response.data.role || response.data.user?.Role || "Employee";
             const user = response.data.user || null;
 
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("role", role);
+
             if (user) {
-              localStorage.setItem("user", JSON.stringify(user));
+                localStorage.setItem("user", JSON.stringify(user));
             }
 
             if (response.data.forcePasswordChange) {
@@ -33,12 +32,11 @@ function Login() {
                 return;
             }
 
-            if (role === "Administrator") {
+            if (role === "Administrator" || role === "Approver") {
                 navigate("/approver-dashboard");
             } else {
                 navigate("/create-po");
             }
-
         } catch (error) {
             console.error(error);
 
@@ -52,12 +50,10 @@ function Login() {
     return (
         <div className="login-container">
             <div className="login-card">
-
                 <h1>Purchase Order Management System</h1>
 
                 <form onSubmit={handleSubmit}>
-
-                        <div className="form-group">
+                    <div className="form-group">
                         <input
                             type="text"
                             placeholder="Username"
@@ -78,9 +74,7 @@ function Login() {
                     <button type="submit" className="submit-btn">
                         Login
                     </button>
-
                 </form>
-
             </div>
         </div>
     );

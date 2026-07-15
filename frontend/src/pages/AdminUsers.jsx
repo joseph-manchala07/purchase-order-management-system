@@ -13,7 +13,6 @@ function AdminUsers() {
 
     const loadUsers = async () => {
         try {
-            // Fetch employees who are approvers (IsApprover = 1)
             const response = await api.get("/employees?isApprover=1");
             setUsers(response.data);
         } catch (error) {
@@ -32,9 +31,9 @@ function AdminUsers() {
         }
     };
 
-    const handleDeleteUser = async (id) => {
+    const handleRemoveAccess = async (id) => {
         try {
-            await api.delete(`/employees/${id}`);
+            await api.put(`/employees/${id}/revoke-admin`);
             loadUsers();
         } catch (error) {
             console.error(error);
@@ -47,14 +46,7 @@ function AdminUsers() {
 
             <div className="page-container">
                 <div className="page-header-row">
-                    <h1>User Management</h1>
-                    <button
-                        type="button"
-                        className="save-btn"
-                        onClick={() => window.location.assign("/admin-users/new")}
-                    >
-                        Add User
-                    </button>
+                    <h1>Approver Management</h1>
                 </div>
 
                 {loading ? (
@@ -65,7 +57,7 @@ function AdminUsers() {
                             <tr>
                                 <th>Name</th>
                                 <th>Username</th>
-                                <th>Role</th>
+                                <th>Title</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -78,8 +70,8 @@ function AdminUsers() {
                                 users.map((user) => (
                                     <tr key={user.EmployeeID}>
                                         <td>{user.EmployeeName}</td>
-                                        <td>{user.Email}</td>
-                                        <td>{user.IsApprover === 1 ? "Administrator" : "Employee"}</td>
+                                        <td>{user.Username || user.Email || `${user.FirstName}.${user.LastName}`.toLowerCase()}</td>
+                                        <td>{user.Title || "-"}</td>
                                         <td>
                                             <button
                                                 type="button"
@@ -91,7 +83,7 @@ function AdminUsers() {
                                             <button
                                                 type="button"
                                                 className="delete-btn"
-                                                onClick={() => handleDeleteUser(user.EmployeeID)}
+                                                onClick={() => handleRemoveAccess(user.EmployeeID)}
                                             >
                                                 Delete
                                             </button>

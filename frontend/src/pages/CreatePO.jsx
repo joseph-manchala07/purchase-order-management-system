@@ -172,7 +172,8 @@ function CreatePO() {
 
             await loadEmployees();
 
-            setNewEmployeeName("");
+            setNewEmployeeFirstName("");
+            setNewEmployeeLastName("");
             setNewEmployeeTitle("");
 
             setShowEmployeeModal(false);
@@ -198,7 +199,8 @@ function CreatePO() {
 
             await loadApprovers();
 
-            setNewApproverName("");
+            setNewApproverFirstName("");
+            setNewApproverLastName("");
             setNewApproverTitle("");
 
             setShowApproverModal(false);

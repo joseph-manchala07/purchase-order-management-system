@@ -141,15 +141,27 @@ exports.getNextPONumber = async (req, res) => {
 exports.getPendingPOs = async (req, res) => {
     try {
 
-        const [rows] = await db.query(`
+        const approverId = Number(
+            req.query.approverId
+        );
+
+        const [rows] = await db.query(
+            `
             SELECT
                 p.PO_ID,
                 p.PO_Number,
-                CONCAT_WS(' ', e.FirstName, e.LastName) AS EmployeeName,
+                CONCAT_WS(
+                    ' ',
+                    e.FirstName,
+                    e.LastName
+                ) AS EmployeeName,
                 v.VendorName,
+                p.PurchaseDescription,
                 p.EstimatedCost,
                 p.Status,
-                p.CreatedDate
+                p.CreatedDate,
+                p.ApprovedBy
+
             FROM PurchaseOrders p
 
             INNER JOIN Employees e
@@ -158,11 +170,14 @@ exports.getPendingPOs = async (req, res) => {
             INNER JOIN Vendors v
                 ON p.VendorID = v.VendorID
 
-            WHERE p.Status =
-                'Pending Approval'
+            WHERE
+                p.Status = 'Pending Approval'
+                AND p.ApprovedBy = ?
 
             ORDER BY p.PO_ID DESC
-        `);
+            `,
+            [approverId]
+        );
 
         res.json(rows);
 
@@ -323,6 +338,52 @@ exports.getApprovedPO = async (req, res) => {
         );
 
         res.json(rows[0]);
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: error.message
+        });
+
+    }
+};
+
+exports.getApproverPOHistory = async (req, res) => {
+    try {
+
+        const approverID =
+            req.params.userid;
+
+        const [rows] = await db.query(
+            `
+            SELECT
+                p.PO_ID,
+                p.PO_Number,
+                CONCAT_WS(' ', e.FirstName, e.LastName) AS EmployeeName,
+                p.PurchaseDescription,
+                p.ReasonForPurchase,
+                p.EstimatedCost,
+                p.Status,
+                p.CreatedDate,
+                p.SubmittedDate,
+                p.ApprovedDate,
+                v.VendorName
+            FROM PurchaseOrders p
+            LEFT JOIN Vendors v
+                ON p.VendorID = v.VendorID
+            LEFT JOIN Employees e
+                ON p.EmployeeID = e.EmployeeID
+            WHERE
+                p.ApprovedBy = ?
+                AND p.Status IN ('Approved', 'Rejected')
+            ORDER BY p.PO_ID DESC
+            `,
+            [approverID]
+        );
+
+        res.json(rows);
 
     } catch (error) {
 

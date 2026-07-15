@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
-
 import CreatePO from "./pages/CreatePO";
 import MyPOs from "./pages/MyPOs";
 import PODetails from "./pages/PODetails";
@@ -16,144 +15,139 @@ import PendingApprovals from "./pages/PendingApprovals";
 import ReviewPO from "./pages/ReviewPO";
 import ApproverForm from "./pages/ApproverForm";
 import AdminUsers from "./pages/AdminUsers";
-import AdminUserForm from "./pages/AdminUserForm";
 import TempAddUser from "./pages/TempAddUser";
 import ChangePassword from "./pages/ChangePassword";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 import EmployeeForm from "./pages/EmployeeForm";
-
 
 function App() {
     return (
         <BrowserRouter>
-
             <Routes>
-
                 <Route path="/" element={<CreatePO />} />
-
-                <Route
-                    path="/login"
-                    element={<Login />}
-                />
-
-                <Route
-                    path="/change-password"
-                    element={<ChangePassword />}
-                />
-
-                <Route
-                    path="/dashboard"
-                    element={<Dashboard />}
-                />
+                <Route path="/login" element={<Login />} />
+                <Route path="/change-password" element={<ChangePassword />} />
+                <Route path="/dashboard" element={<Dashboard />} />
 
                 <Route
                     path="/employee-dashboard"
-                    element={<EmployeeDashboard />}
+                    element={
+                        <ProtectedRoute allowedRole="Administrator">
+                            <EmployeeDashboard />
+                        </ProtectedRoute>
+                    }
                 />
 
-                <Route
-                    path="/create-po"
-                    element={<CreatePO />}
-                />
-
+                <Route path="/create-po" element={<CreatePO />} />
                 <Route
                     path="/my-pos"
-                    element={<MyPOs />}
+                    element={
+                        <ProtectedRoute allowedRoles={["Approver", "Administrator"]}>
+                            <MyPOs />
+                        </ProtectedRoute>
+                    }
                 />
+                <Route path="/po/:id" element={<PODetails />} />
 
-                <Route
-                    path="/po/:id"
-                    element={<PODetails />}
-                />
+                <Route path="/vendors" element={<Vendors />} />
 
-                <Route
-                    path="/vendors"
-                    element={<Vendors />}
-                />
+                <Route path="/vendors/new" element={<VendorForm />} />
 
-                <Route
-                    path="/vendors/new"
-                    element={<VendorForm />}
-                />
-
-                
-                <Route
-                    path="/vendors/edit/:id"
-                    element={<VendorForm />}
-                />
+                <Route path="/vendors/edit/:id" element={<VendorForm />} />
 
                 <Route
                     path="/approver-dashboard"
-                    element={<ApproverDashboard />}
+                    element={
+                        <ProtectedRoute allowedRoles={["Approver", "Administrator"]}>
+                            <ApproverDashboard />
+                        </ProtectedRoute>
+                    }
                 />
-                
+
                 <Route
                     path="/approver-po/:id"
-                    element={<ApproverPODetails />}
+                    element={
+                        <ProtectedRoute allowedRoles={["Approver", "Administrator"]}>
+                            <ApproverPODetails />
+                        </ProtectedRoute>
+                    }
                 />
 
-                
-                <Route
-                    path="/approved-po/:id"
-                    element={<ApprovedPO />}
-                />
+                <Route path="/approved-po/:id" element={<ApprovedPO />} />
 
-                
                 <Route
                     path="/employees"
-                    element={<EmployeeDashboard />}
+                    element={
+                        <ProtectedRoute allowedRole="Administrator">
+                            <EmployeeDashboard />
+                        </ProtectedRoute>
+                    }
                 />
 
                 <Route
                     path="/employees/new"
-                    element={<EmployeeForm />}
+                    element={
+                        <ProtectedRoute allowedRole="Administrator">
+                            <EmployeeForm />
+                        </ProtectedRoute>
+                    }
                 />
 
                 <Route
                     path="/employees/edit/:id"
-                    element={<EmployeeForm />}
+                    element={
+                        <ProtectedRoute allowedRole="Administrator">
+                            <EmployeeForm />
+                        </ProtectedRoute>
+                    }
                 />
 
                 <Route
                     path="/approvers/new"
-                    element={<ApproverForm />}
+                    element={
+                        <ProtectedRoute allowedRole="Administrator">
+                            <ApproverForm />
+                        </ProtectedRoute>
+                    }
                 />
 
                 <Route
                     path="/approvers/edit/:id"
-                    element={<ApproverForm />}
+                    element={
+                        <ProtectedRoute allowedRole="Administrator">
+                            <ApproverForm />
+                        </ProtectedRoute>
+                    }
                 />
-
-                
 
                 <Route
                     path="/admin-users"
-                    element={<AdminUsers />}
+                    element={
+                        <ProtectedRoute allowedRole="Administrator">
+                            <AdminUsers />
+                        </ProtectedRoute>
+                    }
                 />
 
-                <Route
-                    path="/admin-users/new"
-                    element={<AdminUserForm />}
-                />
                 <Route
                     path="/temp-add-user"
-                    element={<TempAddUser />}
+                    element={
+                        <ProtectedRoute allowedRole="Administrator">
+                            <TempAddUser />
+                        </ProtectedRoute>
+                    }
                 />
-                
+
                 <Route
                     path="/pending-approvals"
-                    element={<PendingApprovals />}
+                    element={
+                        <ProtectedRoute allowedRoles={["Approver", "Administrator"]}>
+                            <PendingApprovals />
+                        </ProtectedRoute>
+                    }
                 />
-
-                <Route
-                    path="/review-po/:id"
-                    element={<ReviewPO />}
-                />
-
-
 
             </Routes>
-
         </BrowserRouter>
     );
 }

@@ -15,19 +15,29 @@ function ApproverDashboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        loadPendingPOs();
+        const storedUser = JSON.parse(
+            localStorage.getItem("user") || "null"
+        );
+
+        if (!storedUser?.EmployeeID) {
+            setLoading(false);
+            return;
+        }
+
+        loadPendingPOs(storedUser.EmployeeID);
     }, []);
 
-    const loadPendingPOs = async () => {
-
+    const loadPendingPOs = async (approverId) => {
         try {
 
-            const response =
-                await api.get("/po/pending");
-
-            setPurchaseOrders(
-                response.data
+            const response = await api.get(
+                "/po/pending",
+                {
+                    params: { approverId }
+                }
             );
+
+            setPurchaseOrders(response.data);
 
         } catch (error) {
 

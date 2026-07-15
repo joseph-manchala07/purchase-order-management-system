@@ -6,6 +6,7 @@ const poController = require("../controllers/poController");
 router.post("/", poController.createPO);
 router.get("/next-number", poController.getNextPONumber);
 router.get("/my/:userid", poController.getMyPOs);
+router.get("/approver-history/:userid", poController.getApproverPOHistory);
 router.get("/pending", poController.getPendingPOs);
 router.get("/details/:id", poController.getPOById);
 router.get("/approved/:id", poController.getApprovedPO);

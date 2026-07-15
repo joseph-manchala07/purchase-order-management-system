@@ -13,11 +13,10 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     const [rows] = await db.query(
-      `SELECT EmployeeID, FirstName, LastName, Email, IsApprover, PasswordHash,
+      `SELECT EmployeeID, FirstName, LastName, Email, IsApprover, IsAdministrator, PasswordHash,
               IFNULL(PasswordMustChange, 0) AS PasswordMustChange
        FROM Employees
-       WHERE IsApprover = 1
-         AND (
+       WHERE (
            Email = ?
            OR CONCAT_WS(' ', FirstName, LastName) = ?
            OR CONCAT_WS('.', FirstName, LastName) = ?
@@ -42,11 +41,19 @@ exports.login = async (req, res) => {
     }
 
     const forcePasswordChange =
-      employee.PasswordMustChange === 1 ||
+      Number(employee.PasswordMustChange) === 1 ||
       (await isDefaultPasswordHash(employee.PasswordHash));
 
-    // Map IsApprover to role; keep existing frontend checks working by using "Administrator"
-    const role = employee.IsApprover === 1 ? "Administrator" : "Employee";
+    const isApprover = Number(employee.IsApprover) === 1;
+    const isAdministrator = Number(employee.IsAdministrator) === 1;
+
+    let role = "Employee";
+
+    if (isAdministrator) {
+      role = "Administrator";
+    } else if (isApprover) {
+      role = "Approver";
+    }
 
     const token = jwt.sign(
       {
@@ -69,7 +76,6 @@ exports.login = async (req, res) => {
         Role: role
       }
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server Error" });

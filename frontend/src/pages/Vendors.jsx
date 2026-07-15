@@ -6,6 +6,8 @@ import "../styles/Vendors.css";
 
 function Vendors() {
     const navigate = useNavigate();
+    const role = localStorage.getItem("role") || "Employee";
+    const canDeleteVendor = role === "Approver" || role === "Administrator";
 
     const [vendors, setVendors] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -159,16 +161,18 @@ function Vendors() {
                                                 Edit
                                             </button>
 
-                                            <button
-                                                className="delete-btn"
-                                                onClick={() =>
-                                                    deleteVendor(
-                                                        vendor.VendorID
-                                                    )
-                                                }
-                                            >
-                                                Delete
-                                            </button>
+                                            {canDeleteVendor && (
+                                                <button
+                                                    className="delete-btn"
+                                                    onClick={() =>
+                                                        deleteVendor(
+                                                            vendor.VendorID
+                                                        )
+                                                    }
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
 
                                         </td>
 

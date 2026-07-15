@@ -4,7 +4,6 @@ import api from "../Services/api"
 import "../styles/Login.css";
 
 function ChangePassword() {
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -28,7 +27,6 @@ function ChangePassword() {
       await api.put(
         `/employees/${user.EmployeeID}/change-password`,
         {
-          currentPassword,
           newPassword,
           confirmPassword
         },
@@ -58,15 +56,6 @@ function ChangePassword() {
       <div className="login-card">
         <h1>Change Password</h1>
         <form onSubmit={handleSubmit}>
-
-           <div className="form-group">
-                <input
-                    type="password"
-                    placeholder="Current Password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                />
-           </div>
 
            <div className="form-group">
           <input

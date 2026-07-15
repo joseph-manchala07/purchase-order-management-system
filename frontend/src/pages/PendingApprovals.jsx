@@ -70,7 +70,9 @@ function PendingApprovals() {
                                 </tr>
                             ) : (
                                 purchaseOrders.map((po) => (
-                                    <tr key={po.PO_ID}>
+                                    <tr
+                                        key={po.POID}
+                                    >
                                         <td>
                                             {po.PO_Number}
                                         </td>
@@ -97,17 +99,20 @@ function PendingApprovals() {
                                         </td>
 
                                         <td>
+
                                             <button
                                                 className="review-btn"
                                                 onClick={() =>
                                                     navigate(
-                                                        `/review-po/${po.PO_ID}`
+                                                        `/review-po/${po.POID}`
                                                     )
                                                 }
                                             >
                                                 Review
                                             </button>
+
                                         </td>
+
                                     </tr>
                                 ))
                             )}

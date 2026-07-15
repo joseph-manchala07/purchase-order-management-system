@@ -26,6 +26,11 @@ router.post(
 );
 
 router.put(
+    "/:id/revoke-admin",
+    employeeController.revokeAdministrator
+);
+
+router.put(
     "/:id/change-password",
     auth,
     employeeController.changePassword

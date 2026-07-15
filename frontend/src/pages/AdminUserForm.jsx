@@ -27,7 +27,8 @@ function AdminUserForm() {
             await api.post("/employees", {
                 EmployeeName: `${formData.FirstName.trim()} ${formData.LastName.trim()}`,
                 Title: null,
-                IsApprover: 1
+                IsApprover: 1,
+                IsAdministrator: 1
             });
 
             setSuccessMessage("User added successfully.");
