@@ -16,20 +16,8 @@ const approverRoutes = require("./routes/approverRoutes");
 const app = express();
 
 app.use((req, res, next) => {
-  const start = Date.now();
   const requestPath = req.originalUrl || req.url;
-  console.log("REQUEST:", req.method, requestPath);
-
-  res.on("finish", () => {
-    console.log(
-      "RESPONSE:",
-      req.method,
-      requestPath,
-      res.statusCode,
-      `${Date.now() - start}ms`
-    );
-  });
-
+  console.log("REQUEST HIT:", req.method, requestPath);
   next();
 });
 
@@ -39,42 +27,47 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.get("/", (_req, res) => {
-  res.status(200).json({
-    message: "Purchase Order Management API is running"
-  });
+app.get("/", (req, res) => {
+  res.json({ message: "working" });
 });
 
-app.get("/health", (_req, res) => {
-  res.status(200).json({ status: "ok" });
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
 });
 
 app.get("/debug", (_req, res) => {
-  res.json({
-    status: "running"
-  });
+  res.json({ status: "running" });
 });
 
 app.get("/api/test", (_req, res) => {
-  res.json({
-    message: "API test successful"
-  });
+  res.json({ message: "API test successful" });
 });
 
-const isolateRoutes = process.env.ISOLATE_ROUTES === "true";
+const routeUnderTest = process.env.ROUTE_UNDER_TEST || "all";
 
-if (!isolateRoutes) {
+if (routeUnderTest === "auth") {
+  app.use("/api/auth", authRoutes);
+} else if (routeUnderTest === "vendors") {
+  app.use("/api/vendors", vendorRoutes);
+} else if (routeUnderTest === "po") {
+  app.use("/api/po", poRoutes);
+} else if (routeUnderTest === "employees") {
+  app.use("/api/employees", employeeRoutes);
+} else if (routeUnderTest === "approvers") {
+  app.use("/api/approvers", approverRoutes);
+} else if (routeUnderTest === "all") {
   app.use("/api/auth", authRoutes);
   app.use("/api/vendors", vendorRoutes);
   app.use("/api/po", poRoutes);
   app.use("/api/employees", employeeRoutes);
   app.use("/api/approvers", approverRoutes);
 } else {
-  console.warn("[DEBUG] Route isolation mode enabled: API route modules are not mounted.");
+  console.warn("[DEBUG] No API routes mounted (ROUTE_UNDER_TEST=none).");
 }
 
-const PORT = Number(process.env.PORT) || 3001;
+console.log(`[DEBUG] ROUTE_UNDER_TEST=${routeUnderTest}`);
 
+const PORT = Number(process.env.PORT) || 3001;
 const db = require("./config/db");
 
 app.listen(PORT, "0.0.0.0", () => {
