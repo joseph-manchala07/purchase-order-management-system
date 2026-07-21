@@ -16,8 +16,7 @@ router.get("/:id", (req, res) => {
 
 router.post("/", (req, res) => {
     req.body = req.body || {};
-    req.body.IsApprover = 1;
-    return employeeController.createEmployee(req, res);
+    return employeeController.createOrEnableApprover(req, res);
 });
 
 router.put("/:id", (req, res) => {

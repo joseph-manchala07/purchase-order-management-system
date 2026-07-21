@@ -27,10 +27,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.json({ message: "working" });
-});
-
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
@@ -43,29 +39,19 @@ app.get("/api/test", (_req, res) => {
   res.json({ message: "API test successful" });
 });
 
-const routeUnderTest = process.env.ROUTE_UNDER_TEST || "all";
+app.use("/api/auth", authRoutes);
+app.use("/api/vendors", vendorRoutes);
+app.use("/api/po", poRoutes);
+app.use("/api/employees", employeeRoutes);
+app.use("/api/approvers", approverRoutes);
 
-if (routeUnderTest === "auth") {
-  app.use("/api/auth", authRoutes);
-} else if (routeUnderTest === "vendors") {
-  app.use("/api/vendors", vendorRoutes);
-} else if (routeUnderTest === "po") {
-  app.use("/api/po", poRoutes);
-} else if (routeUnderTest === "employees") {
-  app.use("/api/employees", employeeRoutes);
-} else if (routeUnderTest === "approvers") {
-  app.use("/api/approvers", approverRoutes);
-} else if (routeUnderTest === "all") {
-  app.use("/api/auth", authRoutes);
-  app.use("/api/vendors", vendorRoutes);
-  app.use("/api/po", poRoutes);
-  app.use("/api/employees", employeeRoutes);
-  app.use("/api/approvers", approverRoutes);
-} else {
-  console.warn("[DEBUG] No API routes mounted (ROUTE_UNDER_TEST=none).");
-}
+const frontendDistPath = path.join(__dirname, "../frontend/dist");
+app.use(express.static(frontendDistPath));
 
-console.log(`[DEBUG] ROUTE_UNDER_TEST=${routeUnderTest}`);
+// React Router fallback for non-API routes.
+app.get("/{*any}", (req, res) => {
+  res.sendFile(path.join(frontendDistPath, "index.html"));
+});
 
 const PORT = Number(process.env.PORT) || 3001;
 const db = require("./config/db");

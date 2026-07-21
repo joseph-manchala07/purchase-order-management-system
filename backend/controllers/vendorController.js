@@ -73,6 +73,8 @@ CREATE VENDOR
 --------------------------------------------------
 */
 exports.createVendor = async (req, res) => {
+    let connection;
+
     try {
 
         const {
@@ -89,39 +91,70 @@ exports.createVendor = async (req, res) => {
             Notes
         } = req.body;
 
-        const [result] = await db.query(
-            `
-            INSERT INTO Vendors
-            (
-                VendorName,
-                ContactName,
-                Phone,
-                Fax,
-                Email,
-                Address1,
-                Address2,
-                City,
-                State,
-                ZipCode,
-                Notes
-            )
-            VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `,
-            [
-                VendorName,
-                ContactName,
-                Phone,
-                Fax,
-                Email,
-                Address1,
-                Address2,
-                City,
-                State,
-                ZipCode,
-                Notes
-            ]
-        );
+        connection = await db.getConnection();
+
+        let result;
+        let inserted = false;
+
+        // Set VendorID to the next value after the highest existing VendorID.
+        for (let attempt = 0; attempt < 5 && !inserted; attempt += 1) {
+            const [nextVendorRows] = await connection.query(
+                `
+                SELECT COALESCE(MAX(VendorID), 0) + 1 AS NextVendorID
+                FROM Vendors
+                `
+            );
+
+            const nextVendorId = Number(nextVendorRows[0]?.NextVendorID || 1);
+
+            try {
+                [result] = await connection.query(
+                    `
+                    INSERT INTO Vendors
+                    (
+                        VendorID,
+                        VendorName,
+                        ContactName,
+                        Phone,
+                        Fax,
+                        Email,
+                        Address1,
+                        Address2,
+                        City,
+                        State,
+                        ZipCode,
+                        Notes
+                    )
+                    VALUES
+                    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    `,
+                    [
+                        nextVendorId,
+                        VendorName,
+                        ContactName,
+                        Phone,
+                        Fax,
+                        Email,
+                        Address1,
+                        Address2,
+                        City,
+                        State,
+                        ZipCode,
+                        Notes
+                    ]
+                );
+
+                inserted = true;
+            } catch (insertError) {
+                if (!(insertError && insertError.code === "ER_DUP_ENTRY")) {
+                    throw insertError;
+                }
+            }
+        }
+
+        if (!inserted) {
+            throw new Error("Unable to assign VendorID. Please try again.");
+        }
 
         res.status(201).json({
             message: "Vendor created successfully",
@@ -135,6 +168,12 @@ exports.createVendor = async (req, res) => {
         res.status(500).json({
             message: error.message
         });
+
+    } finally {
+
+        if (connection) {
+            connection.release();
+        }
 
     }
 };

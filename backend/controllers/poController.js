@@ -46,49 +46,25 @@ exports.createPO = async (req, res) => {
         await connection.beginTransaction();
 
         let insertResult;
+        let createdPoId;
+        let insertedPo = false;
 
-        try {
-            [insertResult] = await connection.query(
+        for (let attempt = 0; attempt < 10 && !insertedPo; attempt += 1) {
+            const [nextPoIdRows] = await connection.query(
                 `
-                INSERT INTO PurchaseOrders
-                (
-                    EmployeeID,
-                    ApprovedBy,
-                    VendorID,
-                    PurchaseDescription,
-                    ReasonForPurchase,
-                    EstimatedCost,
-                    Status,
-                    SubmittedDate
-                )
-                VALUES
-                (
-                    ?, ?, ?, ?, ?, ?,
-                    'Pending Approval',
-                    NOW()
-                )
-                `,
-                [
-                    employeeId,
-                    approvedById,
-                    vendorId,
-                    PurchaseDescription.trim(),
-                    ReasonForPurchase.trim(),
-                    estimatedCostValue
-                ]
+                SELECT COALESCE(MAX(PO_ID), 0) + 1 AS NextPOID
+                FROM PurchaseOrders
+                `
             );
-        } catch (error) {
-            // Backward compatibility for schemas where PO_Number has no default.
-            if (
-                error &&
-                error.code === "ER_NO_DEFAULT_FOR_FIELD" &&
-                String(error.message || "").includes("PO_Number")
-            ) {
+
+            createdPoId = Number(nextPoIdRows[0]?.NextPOID || 1);
+
+            try {
                 [insertResult] = await connection.query(
                     `
                     INSERT INTO PurchaseOrders
                     (
-                        PO_Number,
+                        PO_ID,
                         EmployeeID,
                         ApprovedBy,
                         VendorID,
@@ -100,12 +76,13 @@ exports.createPO = async (req, res) => {
                     )
                     VALUES
                     (
-                        0, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?, ?,
                         'Pending Approval',
                         NOW()
                     )
                     `,
                     [
+                        createdPoId,
                         employeeId,
                         approvedById,
                         vendorId,
@@ -114,12 +91,61 @@ exports.createPO = async (req, res) => {
                         estimatedCostValue
                     ]
                 );
-            } else {
-                throw error;
+
+                insertedPo = true;
+            } catch (error) {
+                if (
+                    error &&
+                    error.code === "ER_NO_DEFAULT_FOR_FIELD" &&
+                    String(error.message || "").includes("PO_Number")
+                ) {
+                    [insertResult] = await connection.query(
+                        `
+                        INSERT INTO PurchaseOrders
+                        (
+                            PO_ID,
+                            PO_Number,
+                            EmployeeID,
+                            ApprovedBy,
+                            VendorID,
+                            PurchaseDescription,
+                            ReasonForPurchase,
+                            EstimatedCost,
+                            Status,
+                            SubmittedDate
+                        )
+                        VALUES
+                        (
+                            ?, ?, ?, ?, ?, ?, ?, ?,
+                            'Pending Approval',
+                            NOW()
+                        )
+                        `,
+                        [
+                            createdPoId,
+                            createdPoId,
+                            employeeId,
+                            approvedById,
+                            vendorId,
+                            PurchaseDescription.trim(),
+                            ReasonForPurchase.trim(),
+                            estimatedCostValue
+                        ]
+                    );
+
+                    insertedPo = true;
+                } else if (error && error.code === "ER_DUP_ENTRY") {
+                    continue;
+                } else {
+                    throw error;
+                }
             }
         }
 
-        const createdPoId = Number(insertResult.insertId);
+        if (!insertedPo) {
+            throw new Error("Unable to assign PO_ID. Please try again.");
+        }
+
         let generatedPoNumber = createdPoId;
         let assigned = false;
 

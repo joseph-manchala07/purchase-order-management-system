@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import api from "../Services/api";
 import "../styles/EmployeeDashboard.css";
 
 function EmployeeDashboard() {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [employees, setEmployees] = useState([]);
     const [approvers, setApprovers] = useState([]);
@@ -13,11 +15,22 @@ function EmployeeDashboard() {
     const [searchTerm, setSearchTerm] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [statusMessage, setStatusMessage] = useState("");
 
     useEffect(() => {
         loadEmployees();
         loadApprovers();
     }, []);
+
+    useEffect(() => {
+        if (location.state?.selectedView) {
+            setSelectedView(location.state.selectedView);
+        }
+
+        if (location.state?.message) {
+            setStatusMessage(location.state.message);
+        }
+    }, [location.state]);
 
     const loadEmployees = async () => {
         try {
@@ -127,6 +140,12 @@ function EmployeeDashboard() {
                     </div>
 
                     <div className="employees-toolbar">
+                        {statusMessage && (
+                            <div style={{ marginBottom: "10px", color: "#1e6f3d", fontWeight: 600 }}>
+                                {statusMessage}
+                            </div>
+                        )}
+
                         <input
                             type="text"
                             placeholder="Search Employee..."

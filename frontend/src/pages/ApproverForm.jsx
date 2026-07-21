@@ -49,20 +49,32 @@ function ApproverForm() {
 
         try {
             const payload = {
-                EmployeeName: `${formData.FirstName.trim()} ${formData.LastName.trim()}`,
+                FirstName: formData.FirstName.trim(),
+                LastName: formData.LastName.trim(),
                 Title: formData.Title,
                 IsApprover: 1
             };
 
             if (id) {
                 await api.put(`/employees/${id}`, payload);
+                navigate("/employees", {
+                    state: {
+                        selectedView: "approvers",
+                        message: "Approver updated successfully."
+                    }
+                });
             } else {
-                await api.post("/employees", payload);
+                const response = await api.post("/approvers", payload);
+                navigate("/employees", {
+                    state: {
+                        selectedView: "approvers",
+                        message: response.data?.message || "Approver added"
+                    }
+                });
             }
-            navigate("/employees");
         } catch (error) {
             console.error(error);
-            alert("Failed to save approver.");
+            alert(error.response?.data?.message || "Failed to save approver.");
         }
     };
 

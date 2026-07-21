@@ -26,6 +26,81 @@ const parseEmployeeName = (employeeName, firstName, lastName) => {
   };
 };
 
+const findEmployeeByFirstLastName = async (firstName, lastName) => {
+  const [rows] = await db.query(
+    `SELECT EmployeeID, IsApprover, IsAdministrator
+     FROM Employees
+     WHERE LOWER(TRIM(FirstName)) = LOWER(TRIM(?))
+       AND LOWER(TRIM(LastName)) = LOWER(TRIM(?))
+     LIMIT 1`,
+    [firstName, lastName]
+  );
+
+  return rows[0] || null;
+};
+
+const insertEmployeeWithNextId = async (
+  connection,
+  {
+    firstName,
+    lastName,
+    title,
+    email,
+    isApprover,
+    isAdministrator,
+    passwordHash,
+    passwordMustChange
+  }
+) => {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const [nextIdRows] = await connection.query(
+      `SELECT COALESCE(MAX(EmployeeID), 0) + 1 AS NextEmployeeID FROM Employees`
+    );
+
+    const nextEmployeeId = Number(nextIdRows[0]?.NextEmployeeID || 1);
+
+    try {
+      await connection.query(
+        `
+        INSERT INTO Employees
+        (
+          EmployeeID,
+          FirstName,
+          LastName,
+          Title,
+          Email,
+          IsApprover,
+          IsAdministrator,
+          PasswordHash,
+          PasswordMustChange,
+          CreatedDate
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        `,
+        [
+          nextEmployeeId,
+          firstName,
+          lastName,
+          title,
+          email,
+          isApprover,
+          isAdministrator,
+          passwordHash,
+          passwordMustChange
+        ]
+      );
+
+      return nextEmployeeId;
+    } catch (error) {
+      if (!(error && error.code === "ER_DUP_ENTRY")) {
+        throw error;
+      }
+    }
+  }
+
+  throw new Error("Unable to assign EmployeeID. Please try again.");
+};
+
 // Get employees.
 // Optional query: ?isApprover=1 or ?isAdministrator=1
 exports.getEmployees = async (req, res) => {
@@ -68,9 +143,25 @@ exports.getEmployees = async (req, res) => {
 };
 
 exports.createEmployee = async (req, res) => {
+  let connection;
+
   try {
     const { EmployeeName, FirstName, LastName, Title, Email, IsApprover = 0, IsAdministrator = 0, Password } = req.body;
     const name = parseEmployeeName(EmployeeName, FirstName, LastName);
+
+    if (!name.FirstName || !name.LastName) {
+      return res.status(400).json({ message: "First name and last name are required." });
+    }
+
+    const existingEmployee = await findEmployeeByFirstLastName(name.FirstName, name.LastName);
+
+    if (existingEmployee) {
+      return res.status(409).json({
+        message: "Employee already exists.",
+        employeeId: existingEmployee.EmployeeID
+      });
+    }
+
     const isAdministratorInt = IsAdministrator == 1 ? 1 : 0;
     const isApproverInt = isAdministratorInt === 1 ? 1 : (IsApprover == 1 ? 1 : 0);
 
@@ -84,29 +175,94 @@ exports.createEmployee = async (req, res) => {
 
     const passwordMustChange = isApproverInt === 1 && !Password ? 1 : 0;
 
-    await db.query(
-      `
-            INSERT INTO Employees
-            (
-                FirstName,
-                LastName,
-                Title,
-                Email,
-                IsApprover,
-                IsAdministrator,
-                PasswordHash,
-                PasswordMustChange,
-                CreatedDate
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
-            `,
-      [name.FirstName, name.LastName, Title || null, userEmail, isApproverInt, isAdministratorInt, passwordHash, passwordMustChange]
+    connection = await db.getConnection();
+
+    await insertEmployeeWithNextId(
+      connection,
+      {
+        firstName: name.FirstName,
+        lastName: name.LastName,
+        title: Title || null,
+        email: userEmail,
+        isApprover: isApproverInt,
+        isAdministrator: isAdministratorInt,
+        passwordHash,
+        passwordMustChange
+      }
     );
 
     res.json({ message: "Employee added" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
+};
+
+exports.createOrEnableApprover = async (req, res) => {
+  let connection;
+
+  try {
+    const { EmployeeName, FirstName, LastName, Title, Email } = req.body;
+    const name = parseEmployeeName(EmployeeName, FirstName, LastName);
+
+    if (!name.FirstName || !name.LastName) {
+      return res.status(400).json({ message: "First name and last name are required." });
+    }
+
+    const existingEmployee = await findEmployeeByFirstLastName(name.FirstName, name.LastName);
+
+    if (existingEmployee) {
+      if (Number(existingEmployee.IsApprover) !== 1) {
+        await db.query(
+          `UPDATE Employees
+           SET IsApprover = 1
+           WHERE EmployeeID = ?`,
+          [existingEmployee.EmployeeID]
+        );
+      }
+
+      return res.json({
+        message: "Employee already exists. Approver permissions have been enabled.",
+        employeeId: existingEmployee.EmployeeID,
+        alreadyExisted: true
+      });
+    }
+
+    const normalizedEmail = Email ? Email.trim() : null;
+    const userEmail = normalizedEmail || getDefaultEmail(name.FirstName, name.LastName);
+
+    connection = await db.getConnection();
+
+    const createdEmployeeId = await insertEmployeeWithNextId(
+      connection,
+      {
+        firstName: name.FirstName,
+        lastName: name.LastName,
+        title: Title || null,
+        email: userEmail,
+        isApprover: 1,
+        isAdministrator: 0,
+        passwordHash: null,
+        passwordMustChange: 1
+      }
+    );
+
+    return res.status(201).json({
+      message: "Approver added",
+      employeeId: createdEmployeeId,
+      alreadyExisted: false
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 };
 
