@@ -41,22 +41,19 @@ app.use("/api/vendors", vendorRoutes);
 app.use("/api/po", poRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/approvers", approverRoutes);
-// Users table removed in new design; user routes deprecated.
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3001;
 
-// Simple startup DB check to surfacing DB connectivity or schema issues early.
 const db = require("./config/db");
 
 (async () => {
   try {
-    // quick ping
     await db.query("SELECT 1");
 
     const [columns] = await db.query(
       `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'Employees' AND COLUMN_NAME = 'PasswordMustChange'`,
-      [process.env.DB_NAME || 'PurchaseOrderManagement']
+      [process.env.DB_NAME || "PurchaseOrderManagement"]
     );
 
     if (columns.length === 0) {
