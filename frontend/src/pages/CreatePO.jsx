@@ -11,19 +11,14 @@ function CreatePO() {
     const [EmployeeID, setEmployeeID] = useState("");
     const [ApprovedBy, setApprovedBy] = useState("");
     const [VendorID, setVendorID] = useState("");
-    const [successMessage, setSuccessMessage] =    useState("");
-
+    const [successMessage, setSuccessMessage] = useState("");
 
     const [PurchaseDescription, setPurchaseDescription] = useState("");
     const [ReasonForPurchase, setReasonForPurchase] = useState("");
     const [EstimatedCost, setEstimatedCost] = useState("");
 
-
-    const [showEmployeeModal, setShowEmployeeModal] =
-        useState(false);
-
-    const [showApproverModal, setShowApproverModal] =
-        useState(false);
+    const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+    const [showApproverModal, setShowApproverModal] = useState(false);
 
     const [newEmployeeFirstName, setNewEmployeeFirstName] = useState("");
     const [newEmployeeLastName, setNewEmployeeLastName] = useState("");
@@ -33,38 +28,15 @@ function CreatePO() {
     const [newApproverLastName, setNewApproverLastName] = useState("");
     const [newApproverTitle, setNewApproverTitle] = useState("");
 
-    const [poNumber, setPoNumber] = useState("");
-
     useEffect(() => {
         loadEmployees();
         loadApprovers();
         loadVendors();
-        loadNextPONumber();
     }, []);
-    
-    const loadNextPONumber = async () => {
-        try {
-
-            const response =
-                await api.get("/po/next-number");
-
-            setPoNumber(response.data.poNumber);
-
-            return response.data.poNumber;
-
-        } catch (error) {
-
-            console.error(error);
-
-            return null;
-        }
-    };
 
     const loadEmployees = async () => {
         try {
-            const response =
-                await api.get("/employees");
-
+            const response = await api.get("/employees");
             setEmployees(response.data);
         } catch (error) {
             console.error(error);
@@ -73,7 +45,6 @@ function CreatePO() {
 
     const loadApprovers = async () => {
         try {
-            // Load approvers from Employees where IsApprover = 1
             const response = await api.get("/employees?isApprover=1");
             setApprovers(response.data);
         } catch (error) {
@@ -83,9 +54,7 @@ function CreatePO() {
 
     const loadVendors = async () => {
         try {
-            const response =
-                await api.get("/vendors");
-
+            const response = await api.get("/vendors");
             setVendors(response.data);
         } catch (error) {
             console.error(error);
@@ -130,7 +99,6 @@ function CreatePO() {
         if (!validateForm()) return;
 
         try {
-
             const response = await api.post("/po", {
                 EmployeeID,
                 ApprovedBy,
@@ -141,16 +109,12 @@ function CreatePO() {
             });
 
             setSuccessMessage(
-                `✅ Purchase Order #${response.data.poNumber} has been submitted for Approval`
+                `✅ Purchase Order #${response.data.poNumber} has been submitted for approval`
             );
-
-            await loadNextPONumber();
 
             setPurchaseDescription("");
             setReasonForPurchase("");
             setEstimatedCost("");
-
-
         } catch (error) {
             console.error(error);
             alert("Failed to save Purchase Order");
@@ -177,7 +141,6 @@ function CreatePO() {
             setNewEmployeeTitle("");
 
             setShowEmployeeModal(false);
-
         } catch (error) {
             console.error(error);
             alert("Failed to save employee");
@@ -204,7 +167,6 @@ function CreatePO() {
             setNewApproverTitle("");
 
             setShowApproverModal(false);
-
         } catch (error) {
             console.error(error);
             alert("Failed to save approver");
@@ -216,34 +178,24 @@ function CreatePO() {
             <Navbar />
 
             <div className="create-po-container">
-
                 <div className="po-card">
-
                     <h1>Purchase Orders</h1>
                     {successMessage && (
-                        <div className="success-message">
-                            {successMessage}
-                        </div>
+                        <div className="success-message">{successMessage}</div>
                     )}
 
                     <div className="po-header-grid">
-
                         <div className="left-section">
-
                             <div className="row">
                                 <label>Vendor:</label>
 
                                 <select
                                     value={VendorID}
-                                    onChange={(e) =>
-                                        setVendorID(e.target.value)
-                                    }
+                                    onChange={(e) => setVendorID(e.target.value)}
                                 >
-                                    <option value="">
-                                        Select Vendor
-                                    </option>
+                                    <option value="">Select Vendor</option>
 
-                                    {vendors.map(vendor => (
+                                    {vendors.map((vendor) => (
                                         <option
                                             key={vendor.VendorID}
                                             value={vendor.VendorID}
@@ -259,15 +211,11 @@ function CreatePO() {
 
                                 <select
                                     value={EmployeeID}
-                                    onChange={(e) =>
-                                        setEmployeeID(e.target.value)
-                                    }
+                                    onChange={(e) => setEmployeeID(e.target.value)}
                                 >
-                                    <option value="">
-                                        Select Employee
-                                    </option>
+                                    <option value="">Select Employee</option>
 
-                                    {employees.map(employee => (
+                                    {employees.map((employee) => (
                                         <option
                                             key={employee.EmployeeID}
                                             value={employee.EmployeeID}
@@ -280,9 +228,7 @@ function CreatePO() {
                                 <button
                                     type="button"
                                     className="add-btn"
-                                    onClick={() =>
-                                        setShowEmployeeModal(true)
-                                    }
+                                    onClick={() => setShowEmployeeModal(true)}
                                 >
                                     Add
                                 </button>
@@ -293,15 +239,11 @@ function CreatePO() {
 
                                 <select
                                     value={ApprovedBy}
-                                    onChange={(e) =>
-                                        setApprovedBy(e.target.value)
-                                    }
+                                    onChange={(e) => setApprovedBy(e.target.value)}
                                 >
-                                    <option value="">
-                                        Select Approver
-                                    </option>
+                                    <option value="">Select Approver</option>
 
-                                    {approvers.map(approver => (
+                                    {approvers.map((approver) => (
                                         <option
                                             key={approver.EmployeeID}
                                             value={approver.EmployeeID}
@@ -314,23 +256,19 @@ function CreatePO() {
                                 <button
                                     type="button"
                                     className="add-btn"
-                                    onClick={() =>
-                                        setShowApproverModal(true)
-                                    }
+                                    onClick={() => setShowApproverModal(true)}
                                 >
                                     Add
                                 </button>
                             </div>
-
                         </div>
 
                         <div className="right-section">
-
                             <div className="row">
-                                <label>PO #:</label>
+                                <label>PO Number:</label>
 
                                 <input
-                                    value={poNumber}
+                                    value="Assigned Upon Submission"
                                     readOnly
                                 />
                             </div>
@@ -339,104 +277,63 @@ function CreatePO() {
                                 <label>PO Date:</label>
 
                                 <input
-                                    value={
-                                        new Date()
-                                            .toLocaleDateString()
-                                    }
+                                    value={new Date().toLocaleDateString()}
                                     readOnly
                                 />
                             </div>
-
                         </div>
-
                     </div>
 
                     <div className="po-details">
-
                         <div className="row">
-                            <label>
-                                Purchase Description:
-                            </label>
+                            <label>Purchase Description:</label>
 
                             <input
                                 type="text"
                                 value={PurchaseDescription}
-                                onChange={(e) =>
-                                    setPurchaseDescription(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => setPurchaseDescription(e.target.value)}
                             />
                         </div>
 
                         <div className="row">
-                            <label>
-                                Reason For Purchase:
-                            </label>
+                            <label>Reason For Purchase:</label>
 
                             <input
                                 type="text"
                                 value={ReasonForPurchase}
-                                onChange={(e) =>
-                                    setReasonForPurchase(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => setReasonForPurchase(e.target.value)}
                             />
                         </div>
 
                         <div className="po-cost-grid">
-
                             <div className="row">
-                                <label>
-                                    Estimated Cost:
-                                </label>
+                                <label>Estimated Cost:</label>
 
                                 <input
                                     type="number"
                                     value={EstimatedCost}
-                                    onChange={(e) =>
-                                        setEstimatedCost(
-                                            e.target.value
-                                        )
-                                    }
+                                    onChange={(e) => setEstimatedCost(e.target.value)}
                                 />
                             </div>
-
-                            
-
                         </div>
-
-
-
                     </div>
 
                     <div className="footer-row">
-
-
-
                         <div className="action-buttons">
-
-
                             <button
                                 className="submit-btn"
                                 onClick={savePO}
                             >
                                 Submit For Approval
                             </button>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
 
             {showEmployeeModal && (
                 <div className="modal-overlay">
                     <div className="modal-card">
-
                         <h2>Add Employee</h2>
 
                         <div className="modal-field">
@@ -444,11 +341,7 @@ function CreatePO() {
 
                             <input
                                 value={newEmployeeFirstName}
-                                onChange={(e) =>
-                                    setNewEmployeeFirstName(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => setNewEmployeeFirstName(e.target.value)}
                             />
                         </div>
 
@@ -457,11 +350,7 @@ function CreatePO() {
 
                             <input
                                 value={newEmployeeLastName}
-                                onChange={(e) =>
-                                    setNewEmployeeLastName(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => setNewEmployeeLastName(e.target.value)}
                             />
                         </div>
 
@@ -470,16 +359,11 @@ function CreatePO() {
 
                             <input
                                 value={newEmployeeTitle}
-                                onChange={(e) =>
-                                    setNewEmployeeTitle(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => setNewEmployeeTitle(e.target.value)}
                             />
                         </div>
 
                         <div className="modal-buttons">
-
                             <button
                                 className="submit-btn"
                                 onClick={saveEmployee}
@@ -489,15 +373,11 @@ function CreatePO() {
 
                             <button
                                 className="save-btn"
-                                onClick={() =>
-                                    setShowEmployeeModal(false)
-                                }
+                                onClick={() => setShowEmployeeModal(false)}
                             >
                                 Cancel
                             </button>
-
                         </div>
-
                     </div>
                 </div>
             )}
@@ -505,7 +385,6 @@ function CreatePO() {
             {showApproverModal && (
                 <div className="modal-overlay">
                     <div className="modal-card">
-
                         <h2>Add Approver</h2>
 
                         <div className="modal-field">
@@ -513,11 +392,7 @@ function CreatePO() {
 
                             <input
                                 value={newApproverFirstName}
-                                onChange={(e) =>
-                                    setNewApproverFirstName(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => setNewApproverFirstName(e.target.value)}
                             />
                         </div>
 
@@ -526,11 +401,7 @@ function CreatePO() {
 
                             <input
                                 value={newApproverLastName}
-                                onChange={(e) =>
-                                    setNewApproverLastName(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => setNewApproverLastName(e.target.value)}
                             />
                         </div>
 
@@ -539,16 +410,11 @@ function CreatePO() {
 
                             <input
                                 value={newApproverTitle}
-                                onChange={(e) =>
-                                    setNewApproverTitle(
-                                        e.target.value
-                                    )
-                                }
+                                onChange={(e) => setNewApproverTitle(e.target.value)}
                             />
                         </div>
 
                         <div className="modal-buttons">
-
                             <button
                                 className="submit-btn"
                                 onClick={saveApprover}
@@ -558,15 +424,11 @@ function CreatePO() {
 
                             <button
                                 className="save-btn"
-                                onClick={() =>
-                                    setShowApproverModal(false)
-                                }
+                                onClick={() => setShowApproverModal(false)}
                             >
                                 Cancel
                             </button>
-
                         </div>
-
                     </div>
                 </div>
             )}

@@ -1,8 +1,9 @@
 const db = require("../config/db");
 
 exports.createPO = async (req, res) => {
-    try {
+    let connection;
 
+    try {
         const {
             EmployeeID,
             ApprovedBy,
@@ -12,22 +13,13 @@ exports.createPO = async (req, res) => {
             EstimatedCost
         } = req.body;
 
-        const [rows] = await db.query(`
-            SELECT COALESCE(
-                MAX(CAST(PO_Number AS UNSIGNED)),
-                0
-            ) AS LastPO
-            FROM PurchaseOrders
-        `);
+        connection = await db.getConnection();
+        await connection.beginTransaction();
 
-        const poNumber =
-            Number(rows[0].LastPO) + 1;
-
-        await db.query(
+        const [insertResult] = await connection.query(
             `
             INSERT INTO PurchaseOrders
             (
-                PO_Number,
                 EmployeeID,
                 ApprovedBy,
                 VendorID,
@@ -39,13 +31,12 @@ exports.createPO = async (req, res) => {
             )
             VALUES
             (
-                ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?,
                 'Pending Approval',
                 NOW()
             )
             `,
             [
-                poNumber,
                 EmployeeID,
                 ApprovedBy,
                 VendorID,
@@ -55,26 +46,42 @@ exports.createPO = async (req, res) => {
             ]
         );
 
-        res.json({
-            message:
-                "Purchase Order has been submitted for Approval",
-            poNumber
-        });
+        const generatedPoNumber = Number(insertResult.insertId);
 
+        await connection.query(
+            `
+            UPDATE PurchaseOrders
+            SET PO_Number = ?
+            WHERE PO_ID = ?
+            `,
+            [generatedPoNumber, generatedPoNumber]
+        );
+
+        await connection.commit();
+
+        res.json({
+            message: "Purchase Order has been submitted for approval",
+            poNumber: generatedPoNumber
+        });
     } catch (error) {
+        if (connection) {
+            await connection.rollback();
+        }
 
         console.error(error);
 
         res.status(500).json({
             message: error.message
         });
-
+    } finally {
+        if (connection) {
+            connection.release();
+        }
     }
 };
 
 exports.searchPOs = async (req, res) => {
     try {
-
         const q = `%${(req.query.q || "").trim()}%`;
 
         const [rows] = await db.query(
@@ -106,19 +113,15 @@ exports.searchPOs = async (req, res) => {
         );
 
         res.json(rows);
-
     } catch (error) {
-
         console.error(error);
 
         res.status(500).json({ message: error.message });
-
     }
 };
 
 exports.getAllPOs = async (req, res) => {
     try {
-
         const [rows] = await db.query(
             `
             SELECT
@@ -145,23 +148,18 @@ exports.getAllPOs = async (req, res) => {
         );
 
         res.json(rows);
-
     } catch (error) {
-
         console.error(error);
 
         res.status(500).json({
             message: error.message
         });
-
     }
 };
 
 exports.getMyPOs = async (req, res) => {
     try {
-
-        const employeeID =
-            req.params.userid;
+        const employeeID = req.params.userid;
 
         const [rows] = await db.query(
             `
@@ -185,50 +183,18 @@ exports.getMyPOs = async (req, res) => {
         );
 
         res.json(rows);
-
     } catch (error) {
-
         console.error(error);
 
         res.status(500).json({
             message: error.message
         });
-
     }
 };
 
-exports.getNextPONumber = async (req, res) => {
-    try {
-
-        const [rows] = await db.query(`
-            SELECT COALESCE(
-                MAX(CAST(PO_Number AS UNSIGNED)),
-                0
-            ) AS LastPO
-            FROM PurchaseOrders
-        `);
-
-        res.json({
-            poNumber:
-                Number(rows[0].LastPO) + 1
-        });
-
-    } catch (error) {
-
-        console.error(error);
-
-        res.status(500).json({
-            message: error.message
-        });
-
-    }
-};
 exports.getPendingPOs = async (req, res) => {
     try {
-
-        const approverId = Number(
-            req.query.approverId
-        );
+        const approverId = Number(req.query.approverId);
 
         const [rows] = await db.query(
             `
@@ -265,22 +231,18 @@ exports.getPendingPOs = async (req, res) => {
         );
 
         res.json(rows);
-
     } catch (error) {
-
         console.error(error);
 
         res.status(500).json({
             message: error.message
         });
-
     }
 };
+
 exports.approvePO = async (req, res) => {
     try {
-
-        const { id } =
-            req.params;
+        const { id } = req.params;
 
         await db.query(
             `
@@ -294,25 +256,20 @@ exports.approvePO = async (req, res) => {
         );
 
         res.json({
-            message:
-                "Purchase Order Approved"
+            message: "Purchase Order Approved"
         });
-
     } catch (error) {
-
         console.error(error);
 
         res.status(500).json({
-            message:error.message
+            message: error.message
         });
-
     }
 };
+
 exports.rejectPO = async (req, res) => {
     try {
-
-        const { id } =
-            req.params;
+        const { id } = req.params;
 
         await db.query(
             `
@@ -325,23 +282,19 @@ exports.rejectPO = async (req, res) => {
         );
 
         res.json({
-            message:
-                "Purchase Order Rejected"
+            message: "Purchase Order Rejected"
         });
-
     } catch (error) {
-
         console.error(error);
 
         res.status(500).json({
-            message:error.message
+            message: error.message
         });
-
     }
 };
+
 exports.getPOById = async (req, res) => {
     try {
-
         const { id } = req.params;
 
         const [rows] = await db.query(
@@ -368,21 +321,17 @@ exports.getPOById = async (req, res) => {
         );
 
         res.json(rows[0]);
-
     } catch (error) {
-
         console.error(error);
 
         res.status(500).json({
             message: error.message
         });
-
     }
 };
 
 exports.getApprovedPO = async (req, res) => {
     try {
-
         const { id } = req.params;
 
         const [rows] = await db.query(
@@ -423,23 +372,18 @@ exports.getApprovedPO = async (req, res) => {
         );
 
         res.json(rows[0]);
-
     } catch (error) {
-
         console.error(error);
 
         res.status(500).json({
             message: error.message
         });
-
     }
 };
 
 exports.getApproverPOHistory = async (req, res) => {
     try {
-
-        const approverID =
-            req.params.userid;
+        const approverID = req.params.userid;
 
         const [rows] = await db.query(
             `
@@ -469,14 +413,11 @@ exports.getApproverPOHistory = async (req, res) => {
         );
 
         res.json(rows);
-
     } catch (error) {
-
         console.error(error);
 
         res.status(500).json({
             message: error.message
         });
-
     }
 };
