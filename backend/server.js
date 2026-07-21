@@ -15,6 +15,24 @@ const approverRoutes = require("./routes/approverRoutes");
 
 const app = express();
 
+app.use((req, res, next) => {
+  const start = Date.now();
+  const requestPath = req.originalUrl || req.url;
+  console.log("REQUEST:", req.method, requestPath);
+
+  res.on("finish", () => {
+    console.log(
+      "RESPONSE:",
+      req.method,
+      requestPath,
+      res.statusCode,
+      `${Date.now() - start}ms`
+    );
+  });
+
+  next();
+});
+
 app.use(cors({
   origin: true,
   credentials: true
@@ -43,11 +61,17 @@ app.get("/api/test", (_req, res) => {
   });
 });
 
-app.use("/api/auth", authRoutes);
-app.use("/api/vendors", vendorRoutes);
-app.use("/api/po", poRoutes);
-app.use("/api/employees", employeeRoutes);
-app.use("/api/approvers", approverRoutes);
+const isolateRoutes = process.env.ISOLATE_ROUTES === "true";
+
+if (!isolateRoutes) {
+  app.use("/api/auth", authRoutes);
+  app.use("/api/vendors", vendorRoutes);
+  app.use("/api/po", poRoutes);
+  app.use("/api/employees", employeeRoutes);
+  app.use("/api/approvers", approverRoutes);
+} else {
+  console.warn("[DEBUG] Route isolation mode enabled: API route modules are not mounted.");
+}
 
 const PORT = Number(process.env.PORT) || 3001;
 
