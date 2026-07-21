@@ -13,38 +13,111 @@ exports.createPO = async (req, res) => {
             EstimatedCost
         } = req.body;
 
+        const employeeId = Number(EmployeeID);
+        const approvedById = Number(ApprovedBy);
+        const vendorId = Number(VendorID);
+        const estimatedCostValue = Number(EstimatedCost);
+
+        if (!employeeId || !approvedById || !vendorId) {
+            return res.status(400).json({
+                message: "Employee, approver, and vendor are required."
+            });
+        }
+
+        if (!PurchaseDescription || !PurchaseDescription.trim()) {
+            return res.status(400).json({
+                message: "Purchase description is required."
+            });
+        }
+
+        if (!ReasonForPurchase || !ReasonForPurchase.trim()) {
+            return res.status(400).json({
+                message: "Reason for purchase is required."
+            });
+        }
+
+        if (!estimatedCostValue || estimatedCostValue <= 0) {
+            return res.status(400).json({
+                message: "Estimated cost must be greater than zero."
+            });
+        }
+
         connection = await db.getConnection();
         await connection.beginTransaction();
 
-        const [insertResult] = await connection.query(
-            `
-            INSERT INTO PurchaseOrders
-            (
-                EmployeeID,
-                ApprovedBy,
-                VendorID,
-                PurchaseDescription,
-                ReasonForPurchase,
-                EstimatedCost,
-                Status,
-                SubmittedDate
-            )
-            VALUES
-            (
-                ?, ?, ?, ?, ?, ?,
-                'Pending Approval',
-                NOW()
-            )
-            `,
-            [
-                EmployeeID,
-                ApprovedBy,
-                VendorID,
-                PurchaseDescription,
-                ReasonForPurchase,
-                Number(EstimatedCost) || 0
-            ]
-        );
+        let insertResult;
+
+        try {
+            [insertResult] = await connection.query(
+                `
+                INSERT INTO PurchaseOrders
+                (
+                    EmployeeID,
+                    ApprovedBy,
+                    VendorID,
+                    PurchaseDescription,
+                    ReasonForPurchase,
+                    EstimatedCost,
+                    Status,
+                    SubmittedDate
+                )
+                VALUES
+                (
+                    ?, ?, ?, ?, ?, ?,
+                    'Pending Approval',
+                    NOW()
+                )
+                `,
+                [
+                    employeeId,
+                    approvedById,
+                    vendorId,
+                    PurchaseDescription.trim(),
+                    ReasonForPurchase.trim(),
+                    estimatedCostValue
+                ]
+            );
+        } catch (error) {
+            // Backward compatibility for schemas where PO_Number has no default.
+            if (
+                error &&
+                error.code === "ER_NO_DEFAULT_FOR_FIELD" &&
+                String(error.message || "").includes("PO_Number")
+            ) {
+                [insertResult] = await connection.query(
+                    `
+                    INSERT INTO PurchaseOrders
+                    (
+                        PO_Number,
+                        EmployeeID,
+                        ApprovedBy,
+                        VendorID,
+                        PurchaseDescription,
+                        ReasonForPurchase,
+                        EstimatedCost,
+                        Status,
+                        SubmittedDate
+                    )
+                    VALUES
+                    (
+                        0, ?, ?, ?, ?, ?, ?,
+                        'Pending Approval',
+                        NOW()
+                    )
+                    `,
+                    [
+                        employeeId,
+                        approvedById,
+                        vendorId,
+                        PurchaseDescription.trim(),
+                        ReasonForPurchase.trim(),
+                        estimatedCostValue
+                    ]
+                );
+            } else {
+                throw error;
+            }
+        }
 
         const generatedPoNumber = Number(insertResult.insertId);
 
