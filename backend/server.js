@@ -62,6 +62,26 @@ const db = require("./config/db");
       );
     }
 
+    const [poNumberColumn] = await db.query(
+      `SELECT COLUMN_DEFAULT
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'PurchaseOrders' AND COLUMN_NAME = 'PO_Number'`,
+      [process.env.DB_NAME || "PurchaseOrderManagement"]
+    );
+
+    if (poNumberColumn.length > 0 && poNumberColumn[0].COLUMN_DEFAULT === null) {
+      try {
+        await db.query(
+          "ALTER TABLE PurchaseOrders ALTER COLUMN PO_Number SET DEFAULT 0"
+        );
+      } catch (schemaError) {
+        console.warn(
+          "Unable to set default for PurchaseOrders.PO_Number:",
+          schemaError.message || schemaError
+        );
+      }
+    }
+
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on 0.0.0.0:${PORT}`);
     });

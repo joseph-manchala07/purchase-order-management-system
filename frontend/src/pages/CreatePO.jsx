@@ -117,7 +117,10 @@ function CreatePO() {
             setEstimatedCost("");
         } catch (error) {
             console.error(error);
-            alert("Failed to save Purchase Order");
+            alert(
+                error.response?.data?.message ||
+                "Failed to save Purchase Order"
+            );
         }
     };
 
