@@ -6,29 +6,18 @@ require("dotenv").config({
 const express = require("express");
 const cors = require("cors");
 
+const authRoutes = require("./routes/authRoutes");
+const vendorRoutes = require("./routes/vendorRoutes");
+const poRoutes = require("./routes/poRoutes");
+const employeeRoutes = require("./routes/employeeRoutes");
+const approverRoutes = require("./routes/approverRoutes");
+
 const app = express();
 
-const allowedOrigins = [
-  "http://10.106.0.69:5173",
-  "http://localhost:5173",
-  "http://127.0.0.1:5173"
-];
-
-const corsOptions = {
-  origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-      return;
-    }
-
-    callback(new Error("CORS not allowed for this origin"));
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-};
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json());
 
 app.get("/", (_req, res) => {
@@ -41,11 +30,17 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/vendors", require("./routes/vendorRoutes"));
-app.use("/api/po", require("./routes/poRoutes"));
-app.use("/api/employees", require("./routes/employeeRoutes"));
-app.use("/api/approvers", require("./routes/approverRoutes"));
+app.get("/api/test", (_req, res) => {
+  res.json({
+    message: "API test successful"
+  });
+});
+
+app.use("/api/auth", authRoutes);
+app.use("/api/vendors", vendorRoutes);
+app.use("/api/po", poRoutes);
+app.use("/api/employees", employeeRoutes);
+app.use("/api/approvers", approverRoutes);
 // Users table removed in new design; user routes deprecated.
 
 const PORT = process.env.PORT || 3000;
