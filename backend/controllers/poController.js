@@ -119,16 +119,43 @@ exports.createPO = async (req, res) => {
             }
         }
 
-        const generatedPoNumber = Number(insertResult.insertId);
+        const createdPoId = Number(insertResult.insertId);
+        let generatedPoNumber = createdPoId;
+        let assigned = false;
 
-        await connection.query(
-            `
-            UPDATE PurchaseOrders
-            SET PO_Number = ?
-            WHERE PO_ID = ?
-            `,
-            [generatedPoNumber, generatedPoNumber]
-        );
+        // Handle legacy data collisions by retrying with the next available PO number.
+        for (let attempt = 0; attempt < 10 && !assigned; attempt += 1) {
+            try {
+                await connection.query(
+                    `
+                    UPDATE PurchaseOrders
+                    SET PO_Number = ?
+                    WHERE PO_ID = ?
+                    `,
+                    [generatedPoNumber, createdPoId]
+                );
+
+                assigned = true;
+            } catch (error) {
+                if (!(error && error.code === "ER_DUP_ENTRY")) {
+                    throw error;
+                }
+
+                const [nextNumberRows] = await connection.query(
+                    `
+                    SELECT COALESCE(MAX(CAST(PO_Number AS UNSIGNED)), 0) + 1 AS NextPONumber
+                    FROM PurchaseOrders
+                    `
+                );
+
+                const suggested = Number(nextNumberRows[0]?.NextPONumber || generatedPoNumber + 1);
+                generatedPoNumber = Math.max(suggested, generatedPoNumber + 1);
+            }
+        }
+
+        if (!assigned) {
+            throw new Error("Unable to assign a unique PO number. Please try again.");
+        }
 
         await connection.commit();
 

@@ -82,6 +82,29 @@ const db = require("./config/db");
       }
     }
 
+    try {
+      const [nextPoRows] = await db.query(
+        `SELECT GREATEST(
+            IFNULL(MAX(PO_ID), 0),
+            IFNULL(MAX(CAST(PO_Number AS UNSIGNED)), 0)
+         ) + 1 AS NextAutoIncrement
+         FROM PurchaseOrders`
+      );
+
+      const nextAutoIncrement = Number(nextPoRows[0]?.NextAutoIncrement || 1);
+
+      if (Number.isFinite(nextAutoIncrement) && nextAutoIncrement > 0) {
+        await db.query(
+          `ALTER TABLE PurchaseOrders AUTO_INCREMENT = ${nextAutoIncrement}`
+        );
+      }
+    } catch (schemaError) {
+      console.warn(
+        "Unable to align PurchaseOrders AUTO_INCREMENT:",
+        schemaError.message || schemaError
+      );
+    }
+
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on 0.0.0.0:${PORT}`);
     });
