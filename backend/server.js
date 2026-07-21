@@ -28,7 +28,7 @@ app.use("/api/employees", require("./routes/employeeRoutes"));
 app.use("/api/approvers", require("./routes/approverRoutes"));
 // Users table removed in new design; user routes deprecated.
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 2500;
 
 // Simple startup DB check to surfacing DB connectivity or schema issues early.
 const db = require("./config/db");
