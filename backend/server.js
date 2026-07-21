@@ -11,6 +11,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    message: "Purchase Order Management API is running"
+  });
+});
+
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/vendors", require("./routes/vendorRoutes"));
 app.use("/api/po", require("./routes/poRoutes"));
