@@ -43,7 +43,7 @@ function AdminUsers() {
 
             setErrorMessage("");
             setSuccessMessage(
-                `✅ Password reset for ${selectedUser.EmployeeName} to defaultpassword123! (password we had). Reset to: ${response.data?.resetTo || "First Time Setup"}.`
+                `✅ Password reset for ${selectedUser.EmployeeName}  Reset to: ${response.data?.resetTo || "First Time Setup"}.`
             );
             setShowResetModal(false);
             setSelectedUser(null);
