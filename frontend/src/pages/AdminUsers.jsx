@@ -9,6 +9,7 @@ function AdminUsers() {
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showResetModal, setShowResetModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
@@ -26,23 +27,26 @@ function AdminUsers() {
         }
     };
 
-    const handleResetPassword = async (user) => {
-        const confirmed = window.confirm(
-            `Reset password for ${user.EmployeeName}?`
-        );
+    const handleResetPasswordClick = (user) => {
+        setSelectedUser(user);
+        setShowResetModal(true);
+    };
 
-        if (!confirmed) {
+    const handleResetPassword = async () => {
+        if (!selectedUser) {
             return;
         }
 
         try {
-            const response = await api.post(`/employees/${user.EmployeeID}/reset-password`);
+            const response = await api.post(`/employees/${selectedUser.EmployeeID}/reset-password`);
             await loadUsers();
 
             setErrorMessage("");
             setSuccessMessage(
-                `✅ Password reset for ${user.EmployeeName}. Reset to: ${response.data?.resetTo || "First Time Setup"}.`
+                `✅ Password reset for ${selectedUser.EmployeeName}. Reset to: ${response.data?.resetTo || "First Time Setup"}.`
             );
+            setShowResetModal(false);
+            setSelectedUser(null);
         } catch (error) {
             console.error(error);
 
@@ -127,7 +131,7 @@ function AdminUsers() {
                                             <button
                                                 type="button"
                                                 className="edit-btn"
-                                                onClick={() => handleResetPassword(user)}
+                                                onClick={() => handleResetPasswordClick(user)}
                                             >
                                                 Reset Password
                                             </button>
@@ -161,6 +165,31 @@ function AdminUsers() {
                                     className="save-btn"
                                     onClick={() => {
                                         setShowDeleteModal(false);
+                                        setSelectedUser(null);
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {showResetModal && selectedUser && (
+                    <div className="modal-overlay">
+                        <div className="modal-card">
+                            <h2>Confirm Reset Password</h2>
+                            <p>
+                                Are you sure you want to reset password for {selectedUser.EmployeeName}?
+                            </p>
+                            <div className="modal-buttons">
+                                <button className="submit-btn" onClick={handleResetPassword}>
+                                    Reset Password
+                                </button>
+                                <button
+                                    className="save-btn"
+                                    onClick={() => {
+                                        setShowResetModal(false);
                                         setSelectedUser(null);
                                     }}
                                 >
