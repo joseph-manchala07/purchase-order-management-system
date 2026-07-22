@@ -130,8 +130,6 @@ function ApproverForm() {
                             />
                         </div>
 
-                        {/* Active flag removed; employees are either present or deleted */}
-
                         <div className="button-row">
                             <button
                                 type="button"

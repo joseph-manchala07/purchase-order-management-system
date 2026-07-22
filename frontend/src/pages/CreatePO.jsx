@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import api from "../Services/api";
 import "../styles/CreatePO.css";
 
 function CreatePO() {
+    const navigate = useNavigate();
+
     const [employees, setEmployees] = useState([]);
     const [approvers, setApprovers] = useState([]);
     const [vendors, setVendors] = useState([]);
@@ -11,7 +14,14 @@ function CreatePO() {
     const [EmployeeID, setEmployeeID] = useState("");
     const [ApprovedBy, setApprovedBy] = useState("");
     const [VendorID, setVendorID] = useState("");
+    const [vendorSearch, setVendorSearch] = useState("");
+    const [employeeSearch, setEmployeeSearch] = useState("");
+    const [approverSearch, setApproverSearch] = useState("");
+    const [activeSearchField, setActiveSearchField] = useState(null);
     const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [isLoadingData, setIsLoadingData] = useState(false);
+    const [dataLoadError, setDataLoadError] = useState("");
 
     const [PurchaseDescription, setPurchaseDescription] = useState("");
     const [ReasonForPurchase, setReasonForPurchase] = useState("");
@@ -29,36 +39,97 @@ function CreatePO() {
     const [newApproverTitle, setNewApproverTitle] = useState("");
 
     useEffect(() => {
-        loadEmployees();
-        loadApprovers();
-        loadVendors();
+        loadReferenceData();
     }, []);
 
-    const loadEmployees = async () => {
-        try {
-            const response = await api.get("/employees");
-            setEmployees(response.data);
-        } catch (error) {
-            console.error(error);
+    const loadReferenceData = async () => {
+        setIsLoadingData(true);
+        setDataLoadError("");
+
+        const [employeesResult, approversResult, vendorsResult] = await Promise.allSettled([
+            loadEmployees(),
+            loadApprovers(),
+            loadVendors()
+        ]);
+
+        const hasFailure = [employeesResult, approversResult, vendorsResult]
+            .some((result) => result.status === "rejected");
+
+        if (hasFailure) {
+            setDataLoadError("Unable to load dropdown data. Please ensure server is running and click Retry.");
         }
+
+        setIsLoadingData(false);
+    };
+
+    const filterByName = (items, key, query) => {
+        const normalizedQuery = query.trim().toLowerCase();
+
+        if (!normalizedQuery) {
+            return items;
+        }
+
+        return items.filter((item) =>
+            String(item[key] || "")
+                .toLowerCase()
+                .includes(normalizedQuery)
+        );
+    };
+
+    const filteredVendors = filterByName(vendors, "VendorName", vendorSearch);
+    const filteredEmployees = filterByName(employees, "EmployeeName", employeeSearch);
+    const filteredApprovers = filterByName(approvers, "EmployeeName", approverSearch);
+
+    const updateSelectionFromSearch = (value, items, nameKey, idKey, setSearch, setId) => {
+        setSearch(value);
+
+        const exactMatch = items.find(
+            (item) => String(item[nameKey] || "").toLowerCase() === value.trim().toLowerCase()
+        );
+
+        if (exactMatch) {
+            setId(String(exactMatch[idKey]));
+            return;
+        }
+
+        setId("");
+    };
+
+    const closeSearchList = (field) => {
+        setTimeout(() => {
+            setActiveSearchField((currentField) =>
+                currentField === field ? null : currentField
+            );
+        }, 120);
+    };
+
+    const selectFromList = (field, name, id, setSearch, setId) => {
+        setSearch(name);
+        setId(String(id));
+        setActiveSearchField((currentField) =>
+            currentField === field ? null : currentField
+        );
+    };
+
+    const loadEmployees = async () => {
+        const response = await api.get("/employees");
+        const data = response.data || [];
+        setEmployees(data);
+        return data;
     };
 
     const loadApprovers = async () => {
-        try {
-            const response = await api.get("/employees?isApprover=1");
-            setApprovers(response.data);
-        } catch (error) {
-            console.error(error);
-        }
+        const response = await api.get("/employees?isApprover=1");
+        const data = response.data || [];
+        setApprovers(data);
+        return data;
     };
 
     const loadVendors = async () => {
-        try {
-            const response = await api.get("/vendors");
-            setVendors(response.data);
-        } catch (error) {
-            console.error(error);
-        }
+        const response = await api.get("/vendors");
+        const data = response.data || [];
+        setVendors(data);
+        return data;
     };
 
     const validateForm = () => {
@@ -111,13 +182,15 @@ function CreatePO() {
             setSuccessMessage(
                 `✅ Purchase Order #${response.data.poNumber} has been submitted for approval`
             );
+            setErrorMessage("");
 
             setPurchaseDescription("");
             setReasonForPurchase("");
             setEstimatedCost("");
         } catch (error) {
             console.error(error);
-            alert(
+            setSuccessMessage("");
+            setErrorMessage(
                 error.response?.data?.message ||
                 "Failed to save Purchase Order"
             );
@@ -131,22 +204,41 @@ function CreatePO() {
         }
 
         try {
+            const fullName = `${newEmployeeFirstName.trim()} ${newEmployeeLastName.trim()}`;
+
             await api.post("/employees", {
-                EmployeeName: `${newEmployeeFirstName.trim()} ${newEmployeeLastName.trim()}`,
+                EmployeeName: fullName,
                 Title: newEmployeeTitle,
                 IsApprover: 0
             });
 
-            await loadEmployees();
+            const updatedEmployees = await loadEmployees();
+            const addedEmployee = updatedEmployees.find(
+                (employee) =>
+                    String(employee.EmployeeName || "").toLowerCase() === fullName.toLowerCase()
+            );
+
+            if (addedEmployee) {
+                setEmployeeID(String(addedEmployee.EmployeeID));
+                setEmployeeSearch(addedEmployee.EmployeeName || fullName);
+            } else {
+                setEmployeeSearch(fullName);
+            }
 
             setNewEmployeeFirstName("");
             setNewEmployeeLastName("");
             setNewEmployeeTitle("");
 
             setShowEmployeeModal(false);
+            setErrorMessage("");
+            setSuccessMessage("✅ Employee added successfully.");
         } catch (error) {
             console.error(error);
-            alert("Failed to save employee");
+            setSuccessMessage("");
+            setErrorMessage(
+                error.response?.data?.message ||
+                "Failed to save employee"
+            );
         }
     };
 
@@ -157,22 +249,41 @@ function CreatePO() {
         }
 
         try {
+            const fullName = `${newApproverFirstName.trim()} ${newApproverLastName.trim()}`;
+
             await api.post("/employees", {
-                EmployeeName: `${newApproverFirstName.trim()} ${newApproverLastName.trim()}`,
+                EmployeeName: fullName,
                 Title: newApproverTitle,
                 IsApprover: 1
             });
 
-            await loadApprovers();
+            const updatedApprovers = await loadApprovers();
+            const addedApprover = updatedApprovers.find(
+                (approver) =>
+                    String(approver.EmployeeName || "").toLowerCase() === fullName.toLowerCase()
+            );
+
+            if (addedApprover) {
+                setApprovedBy(String(addedApprover.EmployeeID));
+                setApproverSearch(addedApprover.EmployeeName || fullName);
+            } else {
+                setApproverSearch(fullName);
+            }
 
             setNewApproverFirstName("");
             setNewApproverLastName("");
             setNewApproverTitle("");
 
             setShowApproverModal(false);
+            setErrorMessage("");
+            setSuccessMessage("✅ Approver added successfully.");
         } catch (error) {
             console.error(error);
-            alert("Failed to save approver");
+            setSuccessMessage("");
+            setErrorMessage(
+                error.response?.data?.message ||
+                "Failed to save approver"
+            );
         }
     };
 
@@ -187,46 +298,141 @@ function CreatePO() {
                         <div className="success-message">{successMessage}</div>
                     )}
 
+                    {errorMessage && (
+                        <div className="error-message">{errorMessage}</div>
+                    )}
+
+                    {isLoadingData && (
+                        <div className="info-message">Loading vendor, employee, and approver data...</div>
+                    )}
+
+                    {dataLoadError && (
+                        <div className="error-message">
+                            {dataLoadError}
+                            <button
+                                type="button"
+                                className="retry-btn"
+                                onClick={loadReferenceData}
+                            >
+                                Retry
+                            </button>
+                        </div>
+                    )}
+
                     <div className="po-header-grid">
                         <div className="left-section">
                             <div className="row">
                                 <label>Vendor:</label>
 
-                                <select
-                                    value={VendorID}
-                                    onChange={(e) => setVendorID(e.target.value)}
-                                >
-                                    <option value="">Select Vendor</option>
+                                <div className="search-select-group">
+                                    <input
+                                        type="text"
+                                        placeholder="Search vendor by name"
+                                        value={vendorSearch}
+                                        onFocus={() => setActiveSearchField("vendor")}
+                                        onBlur={() => closeSearchList("vendor")}
+                                        onChange={(e) =>
+                                            updateSelectionFromSearch(
+                                                e.target.value,
+                                                vendors,
+                                                "VendorName",
+                                                "VendorID",
+                                                setVendorSearch,
+                                                setVendorID
+                                            )
+                                        }
+                                    />
 
-                                    {vendors.map((vendor) => (
-                                        <option
-                                            key={vendor.VendorID}
-                                            value={vendor.VendorID}
-                                        >
-                                            {vendor.VendorName}
-                                        </option>
-                                    ))}
-                                </select>
+                                    {activeSearchField === "vendor" && (
+                                        <div className="search-dropdown-list">
+                                            {filteredVendors.length > 0 ? (
+                                                filteredVendors.map((vendor) => (
+                                                    <button
+                                                        key={vendor.VendorID}
+                                                        type="button"
+                                                        className="search-dropdown-item"
+                                                        onMouseDown={() =>
+                                                            selectFromList(
+                                                                "vendor",
+                                                                vendor.VendorName,
+                                                                vendor.VendorID,
+                                                                setVendorSearch,
+                                                                setVendorID
+                                                            )
+                                                        }
+                                                    >
+                                                        {vendor.VendorName}
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                <div className="search-dropdown-empty">
+                                                    No matching vendor found
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className="add-btn"
+                                    onClick={() => navigate("/vendors/new")}
+                                >
+                                    Add
+                                </button>
                             </div>
 
                             <div className="row">
                                 <label>Employee:</label>
 
-                                <select
-                                    value={EmployeeID}
-                                    onChange={(e) => setEmployeeID(e.target.value)}
-                                >
-                                    <option value="">Select Employee</option>
+                                <div className="search-select-group">
+                                    <input
+                                        type="text"
+                                        placeholder="Search employee by name"
+                                        value={employeeSearch}
+                                        onFocus={() => setActiveSearchField("employee")}
+                                        onBlur={() => closeSearchList("employee")}
+                                        onChange={(e) =>
+                                            updateSelectionFromSearch(
+                                                e.target.value,
+                                                employees,
+                                                "EmployeeName",
+                                                "EmployeeID",
+                                                setEmployeeSearch,
+                                                setEmployeeID
+                                            )
+                                        }
+                                    />
 
-                                    {employees.map((employee) => (
-                                        <option
-                                            key={employee.EmployeeID}
-                                            value={employee.EmployeeID}
-                                        >
-                                            {employee.EmployeeName}
-                                        </option>
-                                    ))}
-                                </select>
+                                    {activeSearchField === "employee" && (
+                                        <div className="search-dropdown-list">
+                                            {filteredEmployees.length > 0 ? (
+                                                filteredEmployees.map((employee) => (
+                                                    <button
+                                                        key={employee.EmployeeID}
+                                                        type="button"
+                                                        className="search-dropdown-item"
+                                                        onMouseDown={() =>
+                                                            selectFromList(
+                                                                "employee",
+                                                                employee.EmployeeName,
+                                                                employee.EmployeeID,
+                                                                setEmployeeSearch,
+                                                                setEmployeeID
+                                                            )
+                                                        }
+                                                    >
+                                                        {employee.EmployeeName}
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                <div className="search-dropdown-empty">
+                                                    No matching employee found
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
 
                                 <button
                                     type="button"
@@ -240,21 +446,54 @@ function CreatePO() {
                             <div className="row">
                                 <label>Approve By:</label>
 
-                                <select
-                                    value={ApprovedBy}
-                                    onChange={(e) => setApprovedBy(e.target.value)}
-                                >
-                                    <option value="">Select Approver</option>
+                                <div className="search-select-group">
+                                    <input
+                                        type="text"
+                                        placeholder="Search approver by name"
+                                        value={approverSearch}
+                                        onFocus={() => setActiveSearchField("approver")}
+                                        onBlur={() => closeSearchList("approver")}
+                                        onChange={(e) =>
+                                            updateSelectionFromSearch(
+                                                e.target.value,
+                                                approvers,
+                                                "EmployeeName",
+                                                "EmployeeID",
+                                                setApproverSearch,
+                                                setApprovedBy
+                                            )
+                                        }
+                                    />
 
-                                    {approvers.map((approver) => (
-                                        <option
-                                            key={approver.EmployeeID}
-                                            value={approver.EmployeeID}
-                                        >
-                                            {approver.EmployeeName}
-                                        </option>
-                                    ))}
-                                </select>
+                                    {activeSearchField === "approver" && (
+                                        <div className="search-dropdown-list">
+                                            {filteredApprovers.length > 0 ? (
+                                                filteredApprovers.map((approver) => (
+                                                    <button
+                                                        key={approver.EmployeeID}
+                                                        type="button"
+                                                        className="search-dropdown-item"
+                                                        onMouseDown={() =>
+                                                            selectFromList(
+                                                                "approver",
+                                                                approver.EmployeeName,
+                                                                approver.EmployeeID,
+                                                                setApproverSearch,
+                                                                setApprovedBy
+                                                            )
+                                                        }
+                                                    >
+                                                        {approver.EmployeeName}
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                <div className="search-dropdown-empty">
+                                                    No matching approver found
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
 
                                 <button
                                     type="button"

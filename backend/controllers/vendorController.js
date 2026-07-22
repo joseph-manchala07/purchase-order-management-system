@@ -10,7 +10,19 @@ exports.getVendors = async (req, res) => {
 
         const [rows] = await db.query(
             `
-            SELECT *
+            SELECT
+                VendorID,
+                VendorName,
+                ContactName,
+                Phone,
+                Fax,
+                Email,
+                Address1,
+                City,
+                State,
+                ZipCode,
+                Notes,
+                CreatedDate
             FROM Vendors
             ORDER BY VendorName
             `
@@ -41,7 +53,19 @@ exports.getVendorById = async (req, res) => {
 
         const [rows] = await db.query(
             `
-            SELECT *
+            SELECT
+                VendorID,
+                VendorName,
+                ContactName,
+                Phone,
+                Fax,
+                Email,
+                Address1,
+                City,
+                State,
+                ZipCode,
+                Notes,
+                CreatedDate
             FROM Vendors
             WHERE VendorID = ?
             `,
@@ -84,7 +108,6 @@ exports.createVendor = async (req, res) => {
             Fax,
             Email,
             Address1,
-            Address2,
             City,
             State,
             ZipCode,
@@ -119,14 +142,13 @@ exports.createVendor = async (req, res) => {
                         Fax,
                         Email,
                         Address1,
-                        Address2,
                         City,
                         State,
                         ZipCode,
                         Notes
                     )
                     VALUES
-                    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `,
                     [
                         nextVendorId,
@@ -136,7 +158,6 @@ exports.createVendor = async (req, res) => {
                         Fax,
                         Email,
                         Address1,
-                        Address2,
                         City,
                         State,
                         ZipCode,
@@ -195,7 +216,6 @@ exports.updateVendor = async (req, res) => {
             Fax,
             Email,
             Address1,
-            Address2,
             City,
             State,
             ZipCode,
@@ -212,7 +232,6 @@ exports.updateVendor = async (req, res) => {
                 Fax = ?,
                 Email = ?,
                 Address1 = ?,
-                Address2 = ?,
                 City = ?,
                 State = ?,
                 ZipCode = ?,
@@ -226,7 +245,6 @@ exports.updateVendor = async (req, res) => {
                 Fax,
                 Email,
                 Address1,
-                Address2,
                 City,
                 State,
                 ZipCode,

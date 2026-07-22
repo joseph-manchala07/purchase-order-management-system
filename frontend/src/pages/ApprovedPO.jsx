@@ -92,15 +92,7 @@ function ApprovedPO() {
 
                             {/* Row 2 */}
                             <div className="field-label">Address</div>
-                            <div className="field-value">
-                                {po.Address1}
-                                {po.Address2 && (
-                                    <>
-                                        <br />
-                                        {po.Address2}
-                                    </>
-                                )}
-                            </div>
+                            <div className="field-value">{po.Address1}</div>
 
                             <div className="field-label">Fax</div>
                             <div className="field-value">{po.Fax}</div>

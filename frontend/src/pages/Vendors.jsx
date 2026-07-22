@@ -11,6 +11,10 @@ function Vendors() {
 
     const [vendors, setVendors] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [statusMessage, setStatusMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedVendor, setSelectedVendor] = useState(null);
 
     useEffect(() => {
         loadVendors();
@@ -26,21 +30,34 @@ function Vendors() {
     };
     
 
-    const deleteVendor = async (vendorId) => {
+    const handleDeleteClick = (vendor) => {
+        setSelectedVendor(vendor);
+        setShowDeleteModal(true);
+    };
+
+    const deleteVendor = async () => {
+        if (!selectedVendor) {
+            return;
+        }
 
         try {
 
             await api.delete(
-                `/vendors/${vendorId}`
+                `/vendors/${selectedVendor.VendorID}`
             );
 
-            loadVendors();
+            await loadVendors();
+            setErrorMessage("");
+            setStatusMessage(`✅ ${selectedVendor.VendorName} deleted successfully.`);
+            setShowDeleteModal(false);
+            setSelectedVendor(null);
 
         } catch (error) {
 
             console.error(error);
 
-            alert(
+            setStatusMessage("");
+            setErrorMessage(
                 error.response?.data?.message ||
                 "Unable to delete vendor."
             );
@@ -83,6 +100,14 @@ function Vendors() {
                     </div>
 
                     <div className="vendor-toolbar">
+
+                        {statusMessage && (
+                            <div className="status-success">{statusMessage}</div>
+                        )}
+
+                        {errorMessage && (
+                            <div className="status-error">{errorMessage}</div>
+                        )}
 
                         <input
                             type="text"
@@ -165,9 +190,7 @@ function Vendors() {
                                                 <button
                                                     className="delete-btn"
                                                     onClick={() =>
-                                                        deleteVendor(
-                                                            vendor.VendorID
-                                                        )
+                                                        handleDeleteClick(vendor)
                                                     }
                                                 >
                                                     Delete
@@ -183,6 +206,31 @@ function Vendors() {
                         </tbody>
 
                     </table>
+
+                    {showDeleteModal && selectedVendor && (
+                        <div className="modal-overlay">
+                            <div className="modal-card">
+                                <h2>Confirm Delete</h2>
+                                <p>
+                                    Are you sure you want to delete {selectedVendor.VendorName}?
+                                </p>
+                                <div className="modal-buttons">
+                                    <button className="submit-btn" onClick={deleteVendor}>
+                                        Delete
+                                    </button>
+                                    <button
+                                        className="save-btn"
+                                        onClick={() => {
+                                            setShowDeleteModal(false);
+                                            setSelectedVendor(null);
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
 

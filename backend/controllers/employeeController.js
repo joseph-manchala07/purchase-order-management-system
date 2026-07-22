@@ -416,12 +416,30 @@ exports.resetPassword = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const [employeeRows] = await db.query(
+      `SELECT FirstName, LastName, Email
+       FROM Employees
+       WHERE EmployeeID = ?`,
+      [id]
+    );
+
+    if (employeeRows.length === 0) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    const employee = employeeRows[0];
+    const username = employee.Email || `${employee.FirstName}.${employee.LastName}`.toLowerCase();
+
     await db.query(
       `UPDATE Employees SET PasswordHash = NULL, PasswordMustChange = 1 WHERE EmployeeID = ?`,
       [id]
     );
 
-    res.json({ message: "Password reset. The user must set a new password via First Time Setup." });
+    res.json({
+      message: "Password reset. The user must set a new password via First Time Setup.",
+      username,
+      resetTo: "First Time Setup"
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });

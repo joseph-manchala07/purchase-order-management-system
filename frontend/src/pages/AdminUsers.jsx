@@ -6,6 +6,10 @@ import "../styles/Dashboard.css";
 function AdminUsers() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
         loadUsers();
@@ -22,21 +26,60 @@ function AdminUsers() {
         }
     };
 
-    const handleResetPassword = async (id) => {
+    const handleResetPassword = async (user) => {
+        const confirmed = window.confirm(
+            `Reset password for ${user.EmployeeName}?`
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
         try {
-            await api.post(`/employees/${id}/reset-password`);
-            loadUsers();
+            const response = await api.post(`/employees/${user.EmployeeID}/reset-password`);
+            await loadUsers();
+
+            setErrorMessage("");
+            setSuccessMessage(
+                `✅ Password reset for ${user.EmployeeName}. Reset to: ${response.data?.resetTo || "First Time Setup"}.`
+            );
         } catch (error) {
             console.error(error);
+
+            setSuccessMessage("");
+            setErrorMessage(
+                error.response?.data?.message ||
+                "Failed to reset password."
+            );
         }
     };
 
-    const handleRemoveAccess = async (id) => {
+    const handleRemoveAccessClick = (user) => {
+        setSelectedUser(user);
+        setShowDeleteModal(true);
+    };
+
+    const handleRemoveAccess = async () => {
+        if (!selectedUser) {
+            return;
+        }
+
         try {
-            await api.put(`/employees/${id}/revoke-admin`);
-            loadUsers();
+            await api.put(`/employees/${selectedUser.EmployeeID}/revoke-admin`);
+            await loadUsers();
+
+            setErrorMessage("");
+            setSuccessMessage(`✅ Access removed for ${selectedUser.EmployeeName}.`);
+            setShowDeleteModal(false);
+            setSelectedUser(null);
         } catch (error) {
             console.error(error);
+
+            setSuccessMessage("");
+            setErrorMessage(
+                error.response?.data?.message ||
+                "Failed to remove access."
+            );
         }
     };
 
@@ -48,6 +91,14 @@ function AdminUsers() {
                 <div className="page-header-row">
                     <h1>Approver Management</h1>
                 </div>
+
+                {successMessage && (
+                    <div className="status-success">{successMessage}</div>
+                )}
+
+                {errorMessage && (
+                    <div className="status-error">{errorMessage}</div>
+                )}
 
                 {loading ? (
                     <div>Loading users...</div>
@@ -76,14 +127,14 @@ function AdminUsers() {
                                             <button
                                                 type="button"
                                                 className="edit-btn"
-                                                onClick={() => handleResetPassword(user.EmployeeID)}
+                                                onClick={() => handleResetPassword(user)}
                                             >
                                                 Reset Password
                                             </button>
                                             <button
                                                 type="button"
                                                 className="delete-btn"
-                                                onClick={() => handleRemoveAccess(user.EmployeeID)}
+                                                onClick={() => handleRemoveAccessClick(user)}
                                             >
                                                 Delete
                                             </button>
@@ -93,6 +144,31 @@ function AdminUsers() {
                             )}
                         </tbody>
                     </table>
+                )}
+
+                {showDeleteModal && selectedUser && (
+                    <div className="modal-overlay">
+                        <div className="modal-card">
+                            <h2>Confirm Delete</h2>
+                            <p>
+                                Are you sure you want to delete {selectedUser.EmployeeName}?
+                            </p>
+                            <div className="modal-buttons">
+                                <button className="submit-btn" onClick={handleRemoveAccess}>
+                                    Delete
+                                </button>
+                                <button
+                                    className="save-btn"
+                                    onClick={() => {
+                                        setShowDeleteModal(false);
+                                        setSelectedUser(null);
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 )}
             </div>
         </>

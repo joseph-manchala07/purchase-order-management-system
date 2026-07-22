@@ -15,7 +15,6 @@ function VendorForm() {
         Fax: "",
         Email: "",
         Address1: "",
-        Address2: "",
         City: "",
         State: "",
         ZipCode: "",
@@ -42,7 +41,6 @@ function VendorForm() {
                 Fax: response.data.Fax || "",
                 Email: response.data.Email || "",
                 Address1: response.data.Address1 || "",
-                Address2: response.data.Address2 || "",
                 City: response.data.City || "",
                 State: response.data.State || "",
                 ZipCode: response.data.ZipCode || "",
@@ -186,14 +184,6 @@ function VendorForm() {
                                 name="Address1"
                                 placeholder="Address Line 1"
                                 value={formData.Address1}
-                                onChange={handleChange}
-                            />
-
-                            <input
-                                type="text"
-                                name="Address2"
-                                placeholder="Address Line 2"
-                                value={formData.Address2}
                                 onChange={handleChange}
                             />
 

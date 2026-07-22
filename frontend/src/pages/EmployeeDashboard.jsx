@@ -16,6 +16,7 @@ function EmployeeDashboard() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [statusMessage, setStatusMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
         loadEmployees();
@@ -68,6 +69,8 @@ function EmployeeDashboard() {
             await api.delete(path);
             setShowDeleteModal(false);
             setSelectedItem(null);
+            setErrorMessage("");
+            setStatusMessage(`✅ ${selectedItem.EmployeeName} deleted successfully.`);
 
             if (selectedView === "employees") {
                 loadEmployees();
@@ -76,7 +79,11 @@ function EmployeeDashboard() {
             }
         } catch (error) {
             console.error(error);
-            alert("Unable to delete item.");
+            setStatusMessage("");
+            setErrorMessage(
+                error.response?.data?.message ||
+                "Unable to delete item."
+            );
         }
     };
 
@@ -143,6 +150,12 @@ function EmployeeDashboard() {
                         {statusMessage && (
                             <div style={{ marginBottom: "10px", color: "#1e6f3d", fontWeight: 600 }}>
                                 {statusMessage}
+                            </div>
+                        )}
+
+                        {errorMessage && (
+                            <div style={{ marginBottom: "10px", color: "#a5131b", fontWeight: 600 }}>
+                                {errorMessage}
                             </div>
                         )}
 

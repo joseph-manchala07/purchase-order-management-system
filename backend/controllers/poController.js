@@ -475,7 +475,6 @@ exports.getApprovedPO = async (req, res) => {
                 v.Phone,
                 v.Fax,
                 v.Address1,
-                v.Address2,
                 v.City,
                 v.State,
                 v.ZipCode,
